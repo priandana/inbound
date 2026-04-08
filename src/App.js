@@ -3,7 +3,7 @@ import { Camera, History, Box, Upload, FileWarning, CheckCircle, Package, Truck,
 
 // --- KONFIGURASI ---
 // GANTI URL DI BAWAH INI DENGAN URL WEB APP ANDA!
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxeoOK8BxfrT2Guk3GGh70v15IITYZYQCOA4K_ek3c8n3BkQ080z4Buqyp0DT9prNi6Mw/exec"; 
+const APPS_SCRIPT_URL = ""; 
 const APP_PIN = "123456";
 
 // Data Master
@@ -56,19 +56,19 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-200/50 sm:py-8 flex justify-center items-center font-sans selection:bg-indigo-200">
+    <div className="min-h-screen bg-slate-200/50 sm:py-8 flex justify-center items-center font-sans selection:bg-red-200">
       {/* Mobile Frame (Tampil seperti HP di Desktop) */}
       <div className="w-full sm:w-[400px] h-screen sm:h-[850px] bg-slate-50 sm:rounded-[3rem] sm:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] sm:border-[8px] sm:border-slate-800 relative overflow-hidden flex flex-col transform transition-all">
         
         {/* Background Decor */}
-        <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-400 opacity-90 rounded-b-[3rem] z-0 animate-fade-in"></div>
+        <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-br from-red-700 via-red-600 to-rose-500 opacity-90 rounded-b-[3rem] z-0 animate-fade-in"></div>
         <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-white/20 rounded-full blur-2xl z-0 animate-blob"></div>
 
         {/* Header */}
         <div className="pt-12 pb-6 px-6 relative z-10 animate-slide-up">
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-blue-100 text-xs font-semibold tracking-wider uppercase mb-1 flex items-center gap-1"><Sparkles size={12}/> Gudang Utama</p>
+              <p className="text-rose-100 text-xs font-semibold tracking-wider uppercase mb-1 flex items-center gap-1"><Sparkles size={12}/> Gudang Utama</p>
               <h1 className="text-3xl font-extrabold text-white tracking-tight drop-shadow-md">Inbound Hub</h1>
             </div>
             <button 
@@ -89,18 +89,18 @@ export default function App() {
         <div className="absolute bottom-6 left-6 right-6 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex justify-between p-2 z-50 border border-slate-100 animate-slide-up" style={{ animationDelay: '0.2s' }}>
           <button 
             onClick={() => setActiveTab('form')}
-            className={`flex-1 flex flex-col items-center justify-center py-3 rounded-2xl transition-all duration-500 relative ${activeTab === 'form' ? 'text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
+            className={`flex-1 flex flex-col items-center justify-center py-3 rounded-2xl transition-all duration-500 relative ${activeTab === 'form' ? 'text-red-600' : 'text-slate-400 hover:text-slate-600'}`}
           >
-            {activeTab === 'form' && <div className="absolute inset-0 bg-indigo-50/80 rounded-2xl -z-10"></div>}
+            {activeTab === 'form' && <div className="absolute inset-0 bg-red-50/80 rounded-2xl -z-10"></div>}
             <Box size={22} strokeWidth={activeTab === 'form' ? 2.5 : 2} className={`transition-transform duration-500 ${activeTab === 'form' ? 'scale-110 mb-1' : ''}`} />
             <span className={`text-[10px] font-bold transition-all duration-500 ${activeTab === 'form' ? 'opacity-100' : 'opacity-0 h-0'}`}>Terima Barang</span>
           </button>
           
           <button 
             onClick={() => setActiveTab('history')}
-            className={`flex-1 flex flex-col items-center justify-center py-3 rounded-2xl transition-all duration-500 relative ${activeTab === 'history' ? 'text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
+            className={`flex-1 flex flex-col items-center justify-center py-3 rounded-2xl transition-all duration-500 relative ${activeTab === 'history' ? 'text-red-600' : 'text-slate-400 hover:text-slate-600'}`}
           >
-            {activeTab === 'history' && <div className="absolute inset-0 bg-indigo-50/80 rounded-2xl -z-10"></div>}
+            {activeTab === 'history' && <div className="absolute inset-0 bg-red-50/80 rounded-2xl -z-10"></div>}
             <History size={22} strokeWidth={activeTab === 'history' ? 2.5 : 2} className={`transition-transform duration-500 ${activeTab === 'history' ? 'scale-110 mb-1' : ''}`} />
             <span className={`text-[10px] font-bold transition-all duration-500 ${activeTab === 'history' ? 'opacity-100' : 'opacity-0 h-0'}`}>Riwayat</span>
           </button>
@@ -133,27 +133,27 @@ function LoginScreen({ onLogin }) {
       <div className="w-full sm:w-[400px] h-screen sm:h-[850px] bg-slate-900 sm:rounded-[3rem] sm:border-[8px] sm:border-slate-800 relative overflow-hidden flex flex-col justify-center items-center p-8 shadow-2xl">
         
         {/* Animated Background */}
-        <div className="absolute top-[-10%] left-[-20%] w-96 h-96 bg-indigo-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-blob"></div>
-        <div className="absolute bottom-[-10%] right-[-20%] w-96 h-96 bg-cyan-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-[-10%] left-[-20%] w-96 h-96 bg-red-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-blob"></div>
+        <div className="absolute bottom-[-10%] right-[-20%] w-96 h-96 bg-rose-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-blob animation-delay-2000"></div>
 
         <div className="bg-slate-800 p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl relative z-10 border border-slate-700 flex flex-col items-center animate-scale-in">
-          <div className="bg-gradient-to-br from-indigo-400 to-blue-600 p-5 rounded-[1.5rem] mb-6 shadow-[0_0_30px_rgba(79,70,229,0.5)] animate-float">
+          <div className="bg-gradient-to-br from-red-400 to-red-600 p-5 rounded-[1.5rem] mb-6 shadow-[0_0_30px_rgba(220,38,38,0.5)] animate-float">
             <Package size={40} className="text-white" />
           </div>
           <h2 className="text-2xl font-extrabold text-white mb-2 tracking-tight">Access Control</h2>
-          <p className="text-indigo-200 text-sm mb-8 text-center font-medium">Masukkan PIN rahasia logistik.</p>
+          <p className="text-red-200 text-sm mb-8 text-center font-medium">Masukkan PIN rahasia logistik.</p>
 
           <form onSubmit={handleLogin} className="w-full space-y-5">
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Key size={20} className={`transition-colors ${error ? 'text-red-400' : 'text-indigo-400 group-focus-within:text-indigo-300'}`} />
+                <Key size={20} className={`transition-colors ${error ? 'text-red-400' : 'text-red-400 group-focus-within:text-red-300'}`} />
               </div>
               <input
                 type="password"
                 pattern="[0-9]*"
                 inputMode="numeric"
                 placeholder="• • • • • •"
-                className={`w-full bg-slate-900 border-2 ${error ? 'border-red-500 text-red-100 ring-4 ring-red-500/20' : 'border-slate-700 text-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20'} rounded-2xl py-4 pl-12 pr-4 focus:outline-none transition-all placeholder-slate-600 font-mono tracking-[0.5em] text-xl text-center`}
+                className={`w-full bg-slate-900 border-2 ${error ? 'border-red-500 text-red-100 ring-4 ring-red-500/20' : 'border-slate-700 text-white focus:border-red-500 focus:ring-4 focus:ring-red-500/20'} rounded-2xl py-4 pl-12 pr-4 focus:outline-none transition-all placeholder-slate-600 font-mono tracking-[0.5em] text-xl text-center`}
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 autoFocus
@@ -161,7 +161,7 @@ function LoginScreen({ onLogin }) {
             </div>
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-400 hover:to-blue-500 text-white font-bold py-4 rounded-2xl shadow-[0_10px_25px_-5px_rgba(79,70,229,0.4)] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-4 rounded-2xl shadow-[0_10px_25px_-5px_rgba(220,38,38,0.4)] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
             >
               Autentikasi <ChevronRight size={20} />
             </button>
@@ -224,7 +224,7 @@ function DropdownSearch({ name, options, value, onChange, placeholder, icon: Ico
             filteredOptions.map((opt, i) => (
               <div
                 key={i}
-                className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer transition-colors border-b border-slate-50 last:border-0"
+                className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-red-50 hover:text-red-600 cursor-pointer transition-colors border-b border-slate-50 last:border-0"
                 onClick={() => {
                   onChange({ target: { name, value: opt } });
                   setIsOpen(false);
@@ -265,14 +265,21 @@ function InboundForm() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // LOGIKA AUTO-FILL DITAMBAHKAN DI SINI
-    if (name === 'item') {
-      const selectedItem = ITEMS.find(i => i.name === value);
+    if (name === 'customer') {
+      // Jika customer dipilih/berubah, kosongkan Item dan SKU
+      setFormData(prev => ({ 
+        ...prev, 
+        customer: value,
+        item: '', 
+        sku: '' 
+      }));
+    } else if (name === 'item') {
+      // Cari SKU dari Item yang dipilih (yang sesuai dengan Customer saat ini)
+      const selectedItem = ITEMS.find(i => i.name === value && i.customer === formData.customer);
       setFormData(prev => ({ 
         ...prev, 
         item: value,
-        sku: selectedItem ? selectedItem.sku : '',
-        customer: selectedItem ? selectedItem.customer : prev.customer 
+        sku: selectedItem ? selectedItem.sku : ''
       }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -300,10 +307,12 @@ function InboundForm() {
           
           ctx.fillStyle = 'rgba(15, 23, 42, 0.75)'; 
           ctx.fillRect(0, height - 130, width, 130);
-          ctx.fillStyle = '#4f46e5'; 
+          
+          // Red accent on image watermark
+          ctx.fillStyle = '#dc2626'; 
           ctx.fillRect(0, height - 130, 12, 130);
 
-          ctx.fillStyle = '#38bdf8'; 
+          ctx.fillStyle = '#fca5a5'; 
           ctx.font = 'bold 26px sans-serif';
           ctx.fillText(`[ INBOUND ] ${label}`, 35, height - 85);
           
@@ -362,13 +371,18 @@ function InboundForm() {
     );
   }
 
+  // Filter daftar Item berdasarkan Customer yang sudah dipilih
+  const availableItems = formData.customer 
+    ? ITEMS.filter(i => i.customer === formData.customer).map(i => i.name)
+    : [];
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5 animate-slide-up" style={{ animationDelay: '0.1s' }}>
       
       {/* SECTION: INFO KEDATANGAN */}
       <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-200 space-y-4">
         <div className="flex items-center gap-2 mb-2">
-          <div className="bg-indigo-100 p-1.5 rounded-lg text-indigo-600"><Truck size={16}/></div>
+          <div className="bg-red-100 p-1.5 rounded-lg text-red-600"><Truck size={16}/></div>
           <h3 className="font-bold text-slate-800 text-sm">Info Armada</h3>
         </div>
         
@@ -376,12 +390,12 @@ function InboundForm() {
           <div className="space-y-1.5">
             <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Tanggal</label>
             <div className="relative">
-              <input type="date" name="date" required value={formData.date} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 outline-none transition-all font-medium text-slate-700" />
+              <input type="date" name="date" required value={formData.date} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-400 outline-none transition-all font-medium text-slate-700" />
             </div>
           </div>
           <div className="space-y-1.5">
             <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Nopol</label>
-            <input type="text" name="nopol" required placeholder="D 1234 ABC" value={formData.nopol} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 outline-none transition-all uppercase font-bold text-slate-700" />
+            <input type="text" name="nopol" required placeholder="D 1234 ABC" value={formData.nopol} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-400 outline-none transition-all uppercase font-bold text-slate-700" />
           </div>
         </div>
 
@@ -394,45 +408,45 @@ function InboundForm() {
             onChange={handleInputChange}
             placeholder="Ketik / Pilih Customer..."
             icon={User}
-            className="bg-slate-50 border border-slate-200 focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-400"
+            className="bg-slate-50 border border-slate-200 focus-within:ring-4 focus-within:ring-red-500/10 focus-within:border-red-400"
           />
         </div>
       </div>
 
       {/* SECTION: INFO BARANG */}
-      <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-[2rem] border border-indigo-100 shadow-inner space-y-4 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-red-50 to-rose-50 p-5 rounded-[2rem] border border-red-100 shadow-inner space-y-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-5"><Package size={100} /></div>
         <div className="flex items-center gap-2 mb-2 relative z-10">
-          <div className="bg-white p-1.5 rounded-lg text-indigo-600 shadow-sm"><Box size={16}/></div>
+          <div className="bg-white p-1.5 rounded-lg text-red-600 shadow-sm"><Box size={16}/></div>
           <h3 className="font-bold text-slate-800 text-sm">Detail Barang</h3>
         </div>
 
         <div className="space-y-1.5 relative z-20">
-          <label className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider pl-1">Nama Item</label>
+          <label className="text-[11px] font-bold text-red-500 uppercase tracking-wider pl-1">Nama Item</label>
           <DropdownSearch 
             name="item"
-            options={ITEMS.map(i => i.name)}
+            options={availableItems}
             value={formData.item}
             onChange={handleInputChange}
-            placeholder="Ketik / Pilih Item..."
-            className="bg-white border border-indigo-100 shadow-sm focus-within:ring-4 focus-within:ring-indigo-500/20 focus-within:border-indigo-400"
+            placeholder={formData.customer ? "Ketik / Pilih Item..." : "Pilih Customer dahulu..."}
+            className="bg-white border border-red-100 shadow-sm focus-within:ring-4 focus-within:ring-red-500/20 focus-within:border-red-400"
           />
         </div>
         
         <div className="grid grid-cols-5 gap-3 relative z-10">
           <div className="col-span-3 space-y-1.5">
-            <label className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider pl-1">SKU Code</label>
-            <input type="text" readOnly value={formData.sku} placeholder="Otomatis" className="w-full bg-indigo-100/50 border border-transparent rounded-2xl px-4 py-3.5 text-sm text-indigo-700 font-mono font-bold" />
+            <label className="text-[11px] font-bold text-red-500 uppercase tracking-wider pl-1">SKU Code</label>
+            <input type="text" readOnly value={formData.sku} placeholder="Otomatis" className="w-full bg-red-100/50 border border-transparent rounded-2xl px-4 py-3.5 text-sm text-red-700 font-mono font-bold" />
           </div>
           <div className="col-span-2 space-y-1.5">
-            <label className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider pl-1">Qty (CTN)</label>
-            <input type="number" name="qty" required min="1" value={formData.qty} onChange={handleInputChange} placeholder="0" className="w-full bg-white border border-indigo-100 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-indigo-500/20 outline-none shadow-sm font-bold text-slate-700 text-center" />
+            <label className="text-[11px] font-bold text-red-500 uppercase tracking-wider pl-1">Qty (CTN)</label>
+            <input type="number" name="qty" required min="1" value={formData.qty} onChange={handleInputChange} placeholder="0" className="w-full bg-white border border-red-100 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-red-500/20 outline-none shadow-sm font-bold text-slate-700 text-center" />
           </div>
         </div>
 
         <div className="space-y-1.5 relative z-10">
-          <label className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider pl-1 flex items-center gap-1"><Calendar size={12}/> Expired Date</label>
-          <input type="date" name="expDate" required value={formData.expDate} onChange={handleInputChange} className="w-full bg-white border border-indigo-100 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-indigo-500/20 outline-none shadow-sm font-medium text-slate-700" />
+          <label className="text-[11px] font-bold text-red-500 uppercase tracking-wider pl-1 flex items-center gap-1"><Calendar size={12}/> Expired Date</label>
+          <input type="date" name="expDate" required value={formData.expDate} onChange={handleInputChange} className="w-full bg-white border border-red-100 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-red-500/20 outline-none shadow-sm font-medium text-slate-700" />
         </div>
       </div>
 
@@ -441,14 +455,14 @@ function InboundForm() {
         {/* Foto Utama */}
         <div className="bg-white p-4 rounded-[2rem] border border-slate-200 shadow-sm">
           <div className="flex justify-between items-center mb-3 px-1">
-            <label className="text-sm font-bold text-slate-800 flex items-center gap-2"><Camera size={16} className="text-indigo-500"/> Foto Mobil Kosong <span className="text-red-500">*</span></label>
+            <label className="text-sm font-bold text-slate-800 flex items-center gap-2"><Camera size={16} className="text-red-500"/> Foto Mobil Kosong <span className="text-red-500">*</span></label>
           </div>
           {!mainPhoto ? (
-            <label className="h-32 border-2 border-dashed border-indigo-200 bg-indigo-50/50 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-indigo-50 transition-colors group">
+            <label className="h-32 border-2 border-dashed border-red-200 bg-red-50/50 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-red-50 transition-colors group">
               <div className="bg-white p-3 rounded-full shadow-sm mb-2 group-hover:scale-110 transition-transform">
-                <Camera size={24} className="text-indigo-500" />
+                <Camera size={24} className="text-red-500" />
               </div>
-              <span className="text-xs text-indigo-600 font-bold">Ketuk untuk Foto</span>
+              <span className="text-xs text-red-600 font-bold">Ketuk untuk Foto</span>
               <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handlePhotoCapture(e, 'main')} />
             </label>
           ) : (
@@ -489,7 +503,7 @@ function InboundForm() {
         <button 
           type="submit" 
           disabled={isSubmitting}
-          className={`w-full py-4 rounded-2xl font-extrabold text-white text-lg flex items-center justify-center gap-2 transition-all duration-300 relative overflow-hidden ${isSubmitting ? 'bg-slate-400 scale-[0.98]' : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:shadow-[0_15px_30px_-5px_rgba(79,70,229,0.4)] active:scale-[0.97]'}`}
+          className={`w-full py-4 rounded-2xl font-extrabold text-white text-lg flex items-center justify-center gap-2 transition-all duration-300 relative overflow-hidden ${isSubmitting ? 'bg-slate-400 scale-[0.98]' : 'bg-gradient-to-r from-red-600 to-rose-600 hover:shadow-[0_15px_30px_-5px_rgba(220,38,38,0.4)] active:scale-[0.97]'}`}
         >
           {isSubmitting ? (
              <><Loader2 className="animate-spin" /> MENGUNGGAH...</>
@@ -518,8 +532,8 @@ function HistoryScreen() {
       if (APPS_SCRIPT_URL === "") {
         setTimeout(() => {
           setHistoryData([
-            { timestamp: '08/04/2026 10:30', nopol: 'D 1992 XYZ', customer: 'DIKICHI BANDUNG FRESH', item: 'Ayam Broiler Utuh Grade A', qty: '150' },
-            { timestamp: '08/04/2026 09:15', nopol: 'B 1234 BQ', customer: 'GACOAN BANDUNG FRESH', item: 'Sayap Ayam (Wings)', qty: '80' },
+            { timestamp: '08/04/2026 10:30', nopol: 'D 1992 XYZ', customer: 'DIKICHI BANDUNG FRESH', item: 'BEEF PATTY DKC 70 G', qty: '150' },
+            { timestamp: '08/04/2026 09:15', nopol: 'B 1234 BQ', customer: 'GACOAN BANDUNG FRESH', item: 'AYAM CINCANG (V20)', qty: '80' },
           ]);
           setIsLoading(false);
         }, 1000);
@@ -535,8 +549,8 @@ function HistoryScreen() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-32 animate-fade-in">
-        <div className="bg-white p-4 rounded-3xl shadow-lg shadow-indigo-500/10 mb-4 animate-bounce">
-           <Loader2 size={32} className="text-indigo-500 animate-spin" />
+        <div className="bg-white p-4 rounded-3xl shadow-lg shadow-red-500/10 mb-4 animate-bounce">
+           <Loader2 size={32} className="text-red-500 animate-spin" />
         </div>
         <p className="text-slate-500 font-bold tracking-widest text-xs uppercase">Menyinkronkan...</p>
       </div>
@@ -550,16 +564,16 @@ function HistoryScreen() {
           <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">Log Terkini</h2>
           <p className="text-xs text-slate-500 font-medium">20 Inbound terakhir</p>
         </div>
-        <button onClick={fetchHistory} className="bg-white px-4 py-2 rounded-xl text-xs font-bold text-indigo-600 shadow-sm border border-slate-200 hover:bg-indigo-50 active:scale-95 transition-all">Refresh</button>
+        <button onClick={fetchHistory} className="bg-white px-4 py-2 rounded-xl text-xs font-bold text-red-600 shadow-sm border border-slate-200 hover:bg-red-50 active:scale-95 transition-all">Refresh</button>
       </div>
 
       {historyData.map((item, index) => (
-        <div key={index} className="bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm relative overflow-hidden group hover:border-indigo-300 transition-colors animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-indigo-400 to-blue-500"></div>
+        <div key={index} className="bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm relative overflow-hidden group hover:border-red-300 transition-colors animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
+          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-red-400 to-rose-500"></div>
           
           <div className="flex justify-between items-start mb-4 pl-2">
             <div>
-              <span className="bg-indigo-50 text-indigo-600 text-[9px] font-extrabold tracking-wider px-2.5 py-1 rounded-full mb-2 inline-block border border-indigo-100">
+              <span className="bg-red-50 text-red-600 text-[9px] font-extrabold tracking-wider px-2.5 py-1 rounded-full mb-2 inline-block border border-red-100">
                 {item.timestamp}
               </span>
               <h3 className="font-extrabold text-slate-800 text-sm leading-tight pr-2">{item.customer}</h3>
@@ -572,12 +586,12 @@ function HistoryScreen() {
           
           <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex items-center justify-between ml-2">
             <div className="flex items-center gap-3">
-              <div className="bg-white shadow-sm border border-slate-100 p-2.5 rounded-xl text-indigo-500">
+              <div className="bg-white shadow-sm border border-slate-100 p-2.5 rounded-xl text-red-500">
                 <Package size={18} />
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-700 leading-tight">{item.item}</p>
-                <p className="text-[10px] text-slate-500 mt-0.5">Jumlah: <span className="font-extrabold text-indigo-600 bg-indigo-50 px-1.5 rounded text-[11px] ml-1">{item.qty} CTN</span></p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Jumlah: <span className="font-extrabold text-red-600 bg-red-50 px-1.5 rounded text-[11px] ml-1">{item.qty} CTN</span></p>
               </div>
             </div>
           </div>
