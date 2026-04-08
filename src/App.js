@@ -421,12 +421,12 @@ function InboundForm() {
           <div className="space-y-1.5">
             <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Tanggal</label>
             <div className="relative">
-              <input type="date" name="date" required value={formData.date} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-400 outline-none transition-all font-medium text-slate-700" />
+              <input type="date" name="date" required value={formData.date} onChange={handleInputChange} className="w-full min-h-[50px] block bg-slate-50 border border-slate-200 rounded-2xl px-3 py-3 text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-400 outline-none transition-all font-medium text-slate-700" />
             </div>
           </div>
           <div className="space-y-1.5">
             <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Nopol</label>
-            <input type="text" name="nopol" required placeholder="D 1234 ABC" value={formData.nopol} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-400 outline-none transition-all uppercase font-bold text-slate-700" />
+            <input type="text" name="nopol" required placeholder="D 1234 ABC" value={formData.nopol} onChange={handleInputChange} className="w-full min-h-[50px] block bg-slate-50 border border-slate-200 rounded-2xl px-3 py-3 text-sm focus:ring-4 focus:ring-red-500/10 focus:border-red-400 outline-none transition-all uppercase font-bold text-slate-700" />
           </div>
         </div>
 
@@ -439,7 +439,7 @@ function InboundForm() {
             onChange={handleInputChange}
             placeholder="Ketik / Pilih Customer..."
             icon={User}
-            className="bg-slate-50 border border-slate-200 focus-within:ring-4 focus-within:ring-red-500/10 focus-within:border-red-400"
+            className="bg-slate-50 border border-slate-200 focus-within:ring-4 focus-within:ring-red-500/10 focus-within:border-red-400 min-h-[50px]"
           />
         </div>
       </div>
@@ -460,24 +460,24 @@ function InboundForm() {
             value={formData.item}
             onChange={handleInputChange}
             placeholder={formData.customer ? "Ketik / Pilih Item..." : "Pilih Customer dahulu..."}
-            className="bg-white border border-red-100 shadow-sm focus-within:ring-4 focus-within:ring-red-500/20 focus-within:border-red-400"
+            className="bg-white border border-red-100 shadow-sm focus-within:ring-4 focus-within:ring-red-500/20 focus-within:border-red-400 min-h-[50px]"
           />
         </div>
         
         <div className="grid grid-cols-5 gap-3 relative z-10">
           <div className="col-span-3 space-y-1.5">
             <label className="text-[11px] font-bold text-red-500 uppercase tracking-wider pl-1">SKU Code</label>
-            <input type="text" readOnly value={formData.sku} placeholder="Otomatis" className="w-full bg-red-100/50 border border-transparent rounded-2xl px-4 py-3.5 text-sm text-red-700 font-mono font-bold" />
+            <input type="text" readOnly value={formData.sku} placeholder="Otomatis" className="w-full min-h-[50px] block bg-red-100/50 border border-transparent rounded-2xl px-3 py-3 text-sm text-red-700 font-mono font-bold" />
           </div>
           <div className="col-span-2 space-y-1.5">
             <label className="text-[11px] font-bold text-red-500 uppercase tracking-wider pl-1">Qty (CTN)</label>
-            <input type="number" name="qty" required min="1" value={formData.qty} onChange={handleInputChange} placeholder="0" className="w-full bg-white border border-red-100 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-red-500/20 outline-none shadow-sm font-bold text-slate-700 text-center" />
+            <input type="number" name="qty" required min="1" value={formData.qty} onChange={handleInputChange} placeholder="0" className="w-full min-h-[50px] block bg-white border border-red-100 rounded-2xl px-3 py-3 text-sm focus:ring-4 focus:ring-red-500/20 outline-none shadow-sm font-bold text-slate-700 text-center appearance-none" />
           </div>
         </div>
 
         <div className="space-y-1.5 relative z-10">
           <label className="text-[11px] font-bold text-red-500 uppercase tracking-wider pl-1 flex items-center gap-1"><Calendar size={12}/> Expired Date</label>
-          <input type="date" name="expDate" required value={formData.expDate} onChange={handleInputChange} className="w-full bg-white border border-red-100 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-red-500/20 outline-none shadow-sm font-medium text-slate-700" />
+          <input type="date" name="expDate" required value={formData.expDate} onChange={handleInputChange} className="w-full min-h-[50px] block bg-white border border-red-100 rounded-2xl px-4 py-3 text-sm focus:ring-4 focus:ring-red-500/20 outline-none shadow-sm font-medium text-slate-700 appearance-none" />
         </div>
       </div>
 
@@ -554,11 +554,13 @@ function InboundForm() {
 function HistoryScreen() {
   const [historyData, setHistoryData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false); // State baru untuk mendeteksi error
 
   useEffect(() => { fetchHistory(); }, []);
 
   const fetchHistory = async () => {
     setIsLoading(true);
+    setFetchError(false);
     try {
       if (APPS_SCRIPT_URL === "") {
         setTimeout(() => {
@@ -567,11 +569,26 @@ function HistoryScreen() {
         }, 1000);
       } else {
         const response = await fetch(APPS_SCRIPT_URL + "?action=getHistory");
-        const data = await response.json();
-        setHistoryData(data.data || []);
+        // Gunakan text() dulu untuk menangkap jika Apps Script malah mengembalikan error HTML
+        const text = await response.text(); 
+        try {
+          const data = JSON.parse(text);
+          if (data.status === "success") {
+            setHistoryData(data.data || []);
+          } else {
+            setFetchError(true);
+          }
+        } catch (err) {
+          console.error("Gagal membaca JSON dari server. Respon:", text);
+          setFetchError(true);
+        }
         setIsLoading(false);
       }
-    } catch (error) { setIsLoading(false); }
+    } catch (error) { 
+      console.error("Gagal terhubung ke server:", error);
+      setFetchError(true);
+      setIsLoading(false); 
+    }
   };
 
   if (isLoading) {
@@ -595,7 +612,17 @@ function HistoryScreen() {
         <button onClick={fetchHistory} className="bg-white px-4 py-2 rounded-xl text-xs font-bold text-red-600 shadow-sm border border-slate-200 hover:bg-red-50 active:scale-95 transition-all">Refresh</button>
       </div>
 
-      {historyData.map((item, index) => (
+      {fetchError && (
+        <div className="text-center py-10 bg-red-50 rounded-[2rem] border border-dashed border-red-200 mt-4 animate-fade-in">
+           <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-red-100">
+             <FileWarning size={28} className="text-red-400" />
+           </div>
+           <p className="text-red-500 font-bold text-sm">Gagal memuat data Riwayat.</p>
+           <p className="text-red-400 text-[10px] mt-1 px-4">Pastikan Apps Script sudah di-deploy ke Versi Baru.</p>
+        </div>
+      )}
+
+      {!fetchError && historyData.map((item, index) => (
         <div key={index} className="bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm relative overflow-hidden group hover:border-red-300 transition-colors animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-red-400 to-rose-500"></div>
           
@@ -642,7 +669,7 @@ function HistoryScreen() {
         </div>
       ))}
 
-      {historyData.length === 0 && (
+      {!fetchError && historyData.length === 0 && (
          <div className="text-center py-20 bg-slate-50 rounded-[2rem] border border-dashed border-slate-300 mt-4">
            <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-slate-100">
              <ClipboardList size={28} className="text-slate-300" />
