@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, History, Box, LogIn, Upload, FileWarning, CheckCircle, Package, Truck, Calendar, Key, User, Hash, ClipboardList, Loader2, ArrowLeft, ChevronRight, Sparkles, ChevronDown } from 'lucide-react';
+import { Camera, History, Box, Upload, FileWarning, CheckCircle, Package, Truck, Calendar, Key, User, ClipboardList, Loader2, ArrowLeft, ChevronRight, Sparkles, ChevronDown } from 'lucide-react';
 
 // --- KONFIGURASI ---
 // GANTI URL DI BAWAH INI DENGAN URL WEB APP ANDA!
