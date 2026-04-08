@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, History, Box, Upload, FileWarning, CheckCircle, Package, Truck, Calendar, Key, User, ClipboardList, Loader2, ArrowLeft, ChevronRight, Sparkles, ChevronDown } from 'lucide-react';
+import { Camera, History, Box, Upload, FileWarning, CheckCircle, Package, Truck, Calendar, Key, User, ClipboardList, Loader2, ArrowLeft, ChevronRight, Sparkles, ChevronDown, LogOut, X } from 'lucide-react';
 
 // --- KONFIGURASI ---
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxeoOK8BxfrT2Guk3GGh70v15IITYZYQCOA4K_ek3c8n3BkQ080z4Buqyp0DT9prNi6Mw/exec"; 
@@ -59,6 +59,7 @@ const ITEMS = [
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('form');
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   
   // Inject Custom CSS Animations
   useEffect(() => {
@@ -86,8 +87,42 @@ export default function App() {
     return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
   }
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setShowLogoutConfirm(false);
+  };
+
   return (
     <div className="min-h-screen bg-slate-200/50 sm:py-8 flex justify-center items-center font-sans selection:bg-red-200">
+      
+      {/* Modal Konfirmasi Logout */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[100] flex justify-center items-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade-in" onClick={() => setShowLogoutConfirm(false)}></div>
+          <div className="bg-white p-6 rounded-3xl shadow-2xl w-full max-w-[320px] relative z-10 animate-scale-in border border-slate-100">
+            <div className="bg-red-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <LogOut size={28} className="text-red-500 ml-1" />
+            </div>
+            <h3 className="text-xl font-bold text-center text-slate-800 mb-2">Keluar Aplikasi?</h3>
+            <p className="text-center text-slate-500 text-sm mb-6">Sesi Anda akan diakhiri. Pastikan tidak ada proses upload yang sedang berjalan.</p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 py-3.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 active:scale-95 transition-all"
+              >
+                Batal
+              </button>
+              <button 
+                onClick={handleLogout}
+                className="flex-1 py-3.5 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 active:scale-95 transition-all shadow-md shadow-red-600/20"
+              >
+                Ya, Keluar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Frame (Tampil seperti HP di Desktop) */}
       <div className="w-full sm:w-[400px] h-screen sm:h-[850px] bg-slate-50 sm:rounded-[3rem] sm:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] sm:border-[8px] sm:border-slate-800 relative overflow-hidden flex flex-col transform transition-all">
         
@@ -103,7 +138,7 @@ export default function App() {
               <h1 className="text-3xl font-extrabold text-white tracking-tight drop-shadow-md">Inbound Hub</h1>
             </div>
             <button 
-              onClick={() => setIsLoggedIn(false)}
+              onClick={() => setShowLogoutConfirm(true)}
               className="bg-white/20 backdrop-blur-md p-3 rounded-2xl border border-white/30 shadow-lg cursor-pointer hover:bg-white/30 transition-all active:scale-90 group"
             >
               <User size={22} className="text-white group-hover:scale-110 transition-transform" />
@@ -554,41 +589,27 @@ function InboundForm() {
 function HistoryScreen() {
   const [historyData, setHistoryData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false); // State baru untuk mendeteksi error
 
   useEffect(() => { fetchHistory(); }, []);
 
   const fetchHistory = async () => {
     setIsLoading(true);
-    setFetchError(false);
     try {
       if (APPS_SCRIPT_URL === "") {
         setTimeout(() => {
-          setHistoryData([]);
+          setHistoryData([
+            { timestamp: '08/04/2026 10:30', nopol: 'D 1992 XYZ', customer: 'DIKICHI BANDUNG FRESH', item: 'BEEF PATTY DKC 70 G', qty: '150' },
+            { timestamp: '08/04/2026 09:15', nopol: 'B 1234 BQ', customer: 'GACOAN BANDUNG FRESH', item: 'AYAM CINCANG (V20)', qty: '80' },
+          ]);
           setIsLoading(false);
         }, 1000);
       } else {
         const response = await fetch(APPS_SCRIPT_URL + "?action=getHistory");
-        // Gunakan text() dulu untuk menangkap jika Apps Script malah mengembalikan error HTML
-        const text = await response.text(); 
-        try {
-          const data = JSON.parse(text);
-          if (data.status === "success") {
-            setHistoryData(data.data || []);
-          } else {
-            setFetchError(true);
-          }
-        } catch (err) {
-          console.error("Gagal membaca JSON dari server. Respon:", text);
-          setFetchError(true);
-        }
+        const data = await response.json();
+        setHistoryData(data.data || []);
         setIsLoading(false);
       }
-    } catch (error) { 
-      console.error("Gagal terhubung ke server:", error);
-      setFetchError(true);
-      setIsLoading(false); 
-    }
+    } catch (error) { setIsLoading(false); }
   };
 
   if (isLoading) {
@@ -612,17 +633,7 @@ function HistoryScreen() {
         <button onClick={fetchHistory} className="bg-white px-4 py-2 rounded-xl text-xs font-bold text-red-600 shadow-sm border border-slate-200 hover:bg-red-50 active:scale-95 transition-all">Refresh</button>
       </div>
 
-      {fetchError && (
-        <div className="text-center py-10 bg-red-50 rounded-[2rem] border border-dashed border-red-200 mt-4 animate-fade-in">
-           <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-red-100">
-             <FileWarning size={28} className="text-red-400" />
-           </div>
-           <p className="text-red-500 font-bold text-sm">Gagal memuat data Riwayat.</p>
-           <p className="text-red-400 text-[10px] mt-1 px-4">Pastikan Apps Script sudah di-deploy ke Versi Baru.</p>
-        </div>
-      )}
-
-      {!fetchError && historyData.map((item, index) => (
+      {historyData.map((item, index) => (
         <div key={index} className="bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm relative overflow-hidden group hover:border-red-300 transition-colors animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-red-400 to-rose-500"></div>
           
@@ -650,31 +661,15 @@ function HistoryScreen() {
               </div>
             </div>
           </div>
-
-          {/* Menampilkan Tombol Foto jika link foto tersedia dari Google Sheets */}
-          {(item.mainPhotoUrl || item.defectPhotoUrl) && (
-            <div className="mt-4 pt-3 border-t border-slate-100/60 flex gap-2 ml-2">
-               {item.mainPhotoUrl && (
-                 <a href={item.mainPhotoUrl} target="_blank" rel="noopener noreferrer" className="flex-1 flex justify-center items-center gap-1.5 bg-red-50 text-red-600 px-3 py-2 rounded-xl text-[10px] font-bold hover:bg-red-100 transition-colors border border-red-100/50">
-                   <Camera size={14} /> Lihat Mobil
-                 </a>
-               )}
-               {item.defectPhotoUrl && (
-                 <a href={item.defectPhotoUrl} target="_blank" rel="noopener noreferrer" className="flex-1 flex justify-center items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-2 rounded-xl text-[10px] font-bold hover:bg-amber-100 transition-colors border border-amber-100/50">
-                   <FileWarning size={14} /> Bad Stock
-                 </a>
-               )}
-            </div>
-          )}
         </div>
       ))}
 
-      {!fetchError && historyData.length === 0 && (
+      {historyData.length === 0 && (
          <div className="text-center py-20 bg-slate-50 rounded-[2rem] border border-dashed border-slate-300 mt-4">
            <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-slate-100">
              <ClipboardList size={28} className="text-slate-300" />
            </div>
-           <p className="text-slate-500 font-medium text-sm">Belum ada data masuk.</p>
+           <p className="text-slate-500 font-medium text-sm">Belum ada data masuk hari ini.</p>
          </div>
       )}
     </div>
