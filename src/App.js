@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, History, Box, Upload, FileWarning, CheckCircle, Package, Truck, Calendar, Key, User, ClipboardList, Loader2, ArrowLeft, ChevronRight, Sparkles, ChevronDown, LogOut, X } from 'lucide-react';
+import { Camera, History, Box, Upload, FileWarning, CheckCircle, Package, Truck, Calendar, Key, User, ClipboardList, Loader2, ArrowLeft, ChevronRight, Sparkles, ChevronDown, LogOut } from 'lucide-react';
 
 // --- KONFIGURASI ---
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxeoOK8BxfrT2Guk3GGh70v15IITYZYQCOA4K_ek3c8n3BkQ080z4Buqyp0DT9prNi6Mw/exec"; 
