@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Camera, History, Box, LogIn, Upload, FileWarning, CheckCircle, Package, Truck, Calendar, Key, User, Hash, ClipboardList, Loader2, ArrowLeft } from 'lucide-react';
 
 // --- KONFIGURASI ---
