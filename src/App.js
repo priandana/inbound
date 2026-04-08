@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Camera, History, Box, LogIn, Upload, FileWarning, CheckCircle, Package, Truck, Calendar, Key, User, Hash, ClipboardList, Loader2, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Camera, History, Box, LogIn, Upload, FileWarning, CheckCircle, Package, Truck, Calendar, Key, User, Hash, ClipboardList, Loader2, ArrowLeft, ChevronRight, Sparkles, ChevronDown } from 'lucide-react';
 
 // --- KONFIGURASI ---
-// Ganti URL ini dengan URL Web App dari Google Apps Script Anda nanti!
+// GANTI URL DI BAWAH INI DENGAN URL WEB APP ANDA!
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxeoOK8BxfrT2Guk3GGh70v15IITYZYQCOA4K_ek3c8n3BkQ080z4Buqyp0DT9prNi6Mw/exec"; 
-const APP_PIN = "123456"; // PIN untuk masuk aplikasi
+const APP_PIN = "123456";
 
 // Data Master
 const CUSTOMERS = [
@@ -13,58 +13,98 @@ const CUSTOMERS = [
   "BENFARM BANDUNG FRESH"
 ];
 
+// MENGGUNAKAN DATA ASLI DARI SPREADSHEET ANDA
 const ITEMS = [
-  { name: "Ayam Broiler Utuh Grade A", sku: "BR-A-001" },
-  { name: "Ayam Karkas Grade B", sku: "BR-B-002" },
-  { name: "Sayap Ayam (Wings)", sku: "PR-W-010" },
-  { name: "Dada Ayam Fillet (Boneless)", sku: "PR-B-015" },
-  { name: "Paha Atas", sku: "PR-T-020" }
+  { name: "BEEF PATTY DKC 70 G", sku: "110193", customer: "DIKICHI BANDUNG FRESH" },
+  { name: "BONELESS PAHA DKC 70 G REG", sku: "110206", customer: "DIKICHI BANDUNG FRESH" },
+  { name: "FRENCH FRIES SNOW VALLEY", sku: "110192", customer: "DIKICHI BANDUNG FRESH" },
+  { name: "AYAM CINCANG (V20)", sku: "100211", customer: "GACOAN BANDUNG FRESH" },
+  { name: "ADONAN PANGSIT (V20)", sku: "100209", customer: "GACOAN BANDUNG FRESH" },
+  { name: "MIE (V.20)", sku: "100245", customer: "GACOAN BANDUNG FRESH" },
+  { name: "BENFARM CHICKEN KARAAGE 400 GR", sku: "BEN-00000049", customer: "BENFARM BANDUNG FRESH" },
+  { name: "BENFARM SPICY CHICKEN POPCORN 400GR", sku: "BEN-00000115", customer: "BENFARM BANDUNG FRESH" }
 ];
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState('form'); // 'form' or 'history'
+  const [activeTab, setActiveTab] = useState('form');
   
+  // Inject Custom CSS Animations
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+      @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+      @keyframes blob { 0% { transform: translate(0px, 0px) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } 100% { transform: translate(0px, 0px) scale(1); } }
+      .animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+      .animate-scale-in { animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      .animate-float { animation: float 6s ease-in-out infinite; }
+      .animate-blob { animation: blob 7s infinite; }
+      .animation-delay-2000 { animation-delay: 2s; }
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
+
   if (!isLoggedIn) {
     return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
   }
 
   return (
-    <div className="bg-slate-50 min-h-screen pb-20 font-sans text-slate-800 selection:bg-blue-200">
-      {/* Header */}
-      <div className="bg-blue-600 text-white pt-8 pb-6 px-6 rounded-b-[2.5rem] shadow-lg sticky top-0 z-10">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Inbound Hub</h1>
-            <p className="text-blue-200 text-sm mt-1">Gudang Utama Bandung</p>
-          </div>
-          <div className="bg-blue-500 p-2 rounded-full border border-blue-400 shadow-inner cursor-pointer" onClick={() => setIsLoggedIn(false)}>
-            <User size={24} className="text-white" />
+    <div className="min-h-screen bg-slate-200/50 sm:py-8 flex justify-center items-center font-sans selection:bg-indigo-200">
+      {/* Mobile Frame (Tampil seperti HP di Desktop) */}
+      <div className="w-full sm:w-[400px] h-screen sm:h-[850px] bg-slate-50 sm:rounded-[3rem] sm:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] sm:border-[8px] sm:border-slate-800 relative overflow-hidden flex flex-col transform transition-all">
+        
+        {/* Background Decor */}
+        <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-br from-indigo-600 via-blue-500 to-cyan-400 opacity-90 rounded-b-[3rem] z-0 animate-fade-in"></div>
+        <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-white/20 rounded-full blur-2xl z-0 animate-blob"></div>
+
+        {/* Header */}
+        <div className="pt-12 pb-6 px-6 relative z-10 animate-slide-up">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-blue-100 text-xs font-semibold tracking-wider uppercase mb-1 flex items-center gap-1"><Sparkles size={12}/> Gudang Utama</p>
+              <h1 className="text-3xl font-extrabold text-white tracking-tight drop-shadow-md">Inbound Hub</h1>
+            </div>
+            <button 
+              onClick={() => setIsLoggedIn(false)}
+              className="bg-white/20 backdrop-blur-md p-3 rounded-2xl border border-white/30 shadow-lg cursor-pointer hover:bg-white/30 transition-all active:scale-90 group"
+            >
+              <User size={22} className="text-white group-hover:scale-110 transition-transform" />
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="px-5 -mt-4 relative z-0">
-        {activeTab === 'form' ? <InboundForm /> : <HistoryScreen />}
-      </div>
+        {/* Main Content Area (Scrollable) */}
+        <div className="flex-1 overflow-y-auto hide-scrollbar px-5 pb-28 relative z-10 -mt-2">
+          {activeTab === 'form' ? <InboundForm /> : <HistoryScreen />}
+        </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around py-3 px-6 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50">
-        <button 
-          onClick={() => setActiveTab('form')}
-          className={`flex flex-col items-center p-2 rounded-2xl transition-all duration-300 ${activeTab === 'form' ? 'text-blue-600 scale-110' : 'text-slate-400 hover:text-slate-600'}`}
-        >
-          <Box size={24} strokeWidth={activeTab === 'form' ? 2.5 : 2} />
-          <span className="text-[10px] font-semibold mt-1">Terima Barang</span>
-        </button>
-        <button 
-          onClick={() => setActiveTab('history')}
-          className={`flex flex-col items-center p-2 rounded-2xl transition-all duration-300 ${activeTab === 'history' ? 'text-blue-600 scale-110' : 'text-slate-400 hover:text-slate-600'}`}
-        >
-          <History size={24} strokeWidth={activeTab === 'history' ? 2.5 : 2} />
-          <span className="text-[10px] font-semibold mt-1">Riwayat</span>
-        </button>
+        {/* Floating Bottom Navigation */}
+        <div className="absolute bottom-6 left-6 right-6 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex justify-between p-2 z-50 border border-slate-100 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <button 
+            onClick={() => setActiveTab('form')}
+            className={`flex-1 flex flex-col items-center justify-center py-3 rounded-2xl transition-all duration-500 relative ${activeTab === 'form' ? 'text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
+          >
+            {activeTab === 'form' && <div className="absolute inset-0 bg-indigo-50/80 rounded-2xl -z-10"></div>}
+            <Box size={22} strokeWidth={activeTab === 'form' ? 2.5 : 2} className={`transition-transform duration-500 ${activeTab === 'form' ? 'scale-110 mb-1' : ''}`} />
+            <span className={`text-[10px] font-bold transition-all duration-500 ${activeTab === 'form' ? 'opacity-100' : 'opacity-0 h-0'}`}>Terima Barang</span>
+          </button>
+          
+          <button 
+            onClick={() => setActiveTab('history')}
+            className={`flex-1 flex flex-col items-center justify-center py-3 rounded-2xl transition-all duration-500 relative ${activeTab === 'history' ? 'text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
+          >
+            {activeTab === 'history' && <div className="absolute inset-0 bg-indigo-50/80 rounded-2xl -z-10"></div>}
+            <History size={22} strokeWidth={activeTab === 'history' ? 2.5 : 2} className={`transition-transform duration-500 ${activeTab === 'history' ? 'scale-110 mb-1' : ''}`} />
+            <span className={`text-[10px] font-bold transition-all duration-500 ${activeTab === 'history' ? 'opacity-100' : 'opacity-0 h-0'}`}>Riwayat</span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -89,42 +129,116 @@ function LoginScreen({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col justify-center items-center p-6 relative overflow-hidden">
-      {/* Background Decoration */}
-      <div className="absolute top-[-10%] left-[-20%] w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
-      <div className="absolute top-[-10%] right-[-20%] w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
+    <div className="min-h-screen bg-slate-900 sm:py-8 flex justify-center items-center font-sans">
+      <div className="w-full sm:w-[400px] h-screen sm:h-[850px] bg-slate-900 sm:rounded-[3rem] sm:border-[8px] sm:border-slate-800 relative overflow-hidden flex flex-col justify-center items-center p-8 shadow-2xl">
+        
+        {/* Animated Background */}
+        <div className="absolute top-[-10%] left-[-20%] w-96 h-96 bg-indigo-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-blob"></div>
+        <div className="absolute bottom-[-10%] right-[-20%] w-96 h-96 bg-cyan-600 rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-blob animation-delay-2000"></div>
 
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-[2rem] w-full max-w-sm shadow-2xl relative z-10 flex flex-col items-center">
-        <div className="bg-blue-500 text-white p-4 rounded-2xl mb-6 shadow-lg shadow-blue-500/30">
-          <Package size={40} />
-        </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Masuk Logistik</h2>
-        <p className="text-slate-300 text-sm mb-8 text-center">Masukkan PIN rahasia untuk mengakses sistem inbound.</p>
-
-        <form onSubmit={handleLogin} className="w-full">
-          <div className="relative mb-6">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Key size={20} className="text-slate-400" />
-            </div>
-            <input
-              type="password"
-              pattern="[0-9]*"
-              inputMode="numeric"
-              placeholder="Masukkan PIN"
-              className={`w-full bg-slate-800/50 border ${error ? 'border-red-500 text-red-100' : 'border-slate-600 text-white'} rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-slate-500 font-mono tracking-widest text-lg`}
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-              autoFocus
-            />
+        <div className="bg-slate-800 p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl relative z-10 border border-slate-700 flex flex-col items-center animate-scale-in">
+          <div className="bg-gradient-to-br from-indigo-400 to-blue-600 p-5 rounded-[1.5rem] mb-6 shadow-[0_0_30px_rgba(79,70,229,0.5)] animate-float">
+            <Package size={40} className="text-white" />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-600/30 transition-all active:scale-95 flex items-center justify-center gap-2"
-          >
-            Masuk <LogIn size={20} />
-          </button>
-        </form>
+          <h2 className="text-2xl font-extrabold text-white mb-2 tracking-tight">Access Control</h2>
+          <p className="text-indigo-200 text-sm mb-8 text-center font-medium">Masukkan PIN rahasia logistik.</p>
+
+          <form onSubmit={handleLogin} className="w-full space-y-5">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Key size={20} className={`transition-colors ${error ? 'text-red-400' : 'text-indigo-400 group-focus-within:text-indigo-300'}`} />
+              </div>
+              <input
+                type="password"
+                pattern="[0-9]*"
+                inputMode="numeric"
+                placeholder="• • • • • •"
+                className={`w-full bg-slate-900 border-2 ${error ? 'border-red-500 text-red-100 ring-4 ring-red-500/20' : 'border-slate-700 text-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20'} rounded-2xl py-4 pl-12 pr-4 focus:outline-none transition-all placeholder-slate-600 font-mono tracking-[0.5em] text-xl text-center`}
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-400 hover:to-blue-500 text-white font-bold py-4 rounded-2xl shadow-[0_10px_25px_-5px_rgba(79,70,229,0.4)] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+            >
+              Autentikasi <ChevronRight size={20} />
+            </button>
+          </form>
+        </div>
       </div>
+    </div>
+  );
+}
+
+// ==========================================
+// CUSTOM SEARCHABLE DROPDOWN
+// ==========================================
+function DropdownSearch({ name, options, value, onChange, placeholder, icon: Icon, className }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setIsOpen(false);
+        setSearch("");
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredOptions = options.filter(opt => 
+    opt.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      {/* Hidden input untuk validasi form bawaan HTML5 */}
+      <input type="text" name={name} required value={value} readOnly className="absolute opacity-0 w-0 h-0 pointer-events-none" />
+      
+      {Icon && <Icon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />}
+      <div 
+        className={`w-full flex items-center justify-between rounded-2xl py-3.5 pr-4 transition-all cursor-text ${Icon ? 'pl-11' : 'pl-4'} ${className}`}
+        onClick={() => setIsOpen(true)}
+      >
+        <input
+          type="text"
+          placeholder={value || placeholder}
+          value={isOpen ? search : value}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            if (!isOpen) setIsOpen(true);
+          }}
+          className="w-full bg-transparent outline-none font-medium text-slate-700 placeholder-slate-400"
+        />
+        <ChevronDown size={16} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl max-h-56 overflow-y-auto py-2 animate-slide-up hide-scrollbar">
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((opt, i) => (
+              <div
+                key={i}
+                className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer transition-colors border-b border-slate-50 last:border-0"
+                onClick={() => {
+                  onChange({ target: { name, value: opt } });
+                  setIsOpen(false);
+                  setSearch("");
+                }}
+              >
+                {opt}
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-3 text-sm text-slate-400 italic text-center">Data tidak ditemukan</div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -150,16 +264,21 @@ function InboundForm() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-
-    // Auto fill SKU when Item changes
+    
+    // LOGIKA AUTO-FILL DITAMBAHKAN DI SINI
     if (name === 'item') {
       const selectedItem = ITEMS.find(i => i.name === value);
-      setFormData(prev => ({ ...prev, sku: selectedItem ? selectedItem.sku : '' }));
+      setFormData(prev => ({ 
+        ...prev, 
+        item: value,
+        sku: selectedItem ? selectedItem.sku : '',
+        customer: selectedItem ? selectedItem.customer : prev.customer 
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  // Watermark Image Processor
   const processImage = (file, label) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -168,46 +287,30 @@ function InboundForm() {
         img.onload = () => {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
-          
-          // Max dimension for optimization
           const MAX_WIDTH = 1280;
-          let width = img.width;
-          let height = img.height;
+          let width = img.width, height = img.height;
           
-          if (width > MAX_WIDTH) {
-            height = Math.round((height * MAX_WIDTH) / width);
-            width = MAX_WIDTH;
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          
-          // Draw Original Image
+          if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+          canvas.width = width; canvas.height = height;
           ctx.drawImage(img, 0, 0, width, height);
           
-          // Draw Awesome Timestamp Background
           const now = new Date();
           const timeStr = now.toLocaleTimeString('id-ID');
           const dateStr = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-          const textBlockHeight = 120;
           
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; // Semi-transparent black
-          ctx.fillRect(0, height - textBlockHeight, width, textBlockHeight);
-          
-          ctx.fillStyle = '#1e40af'; // Blue accent bar
-          ctx.fillRect(0, height - textBlockHeight, 10, textBlockHeight);
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.75)'; 
+          ctx.fillRect(0, height - 130, width, 130);
+          ctx.fillStyle = '#4f46e5'; 
+          ctx.fillRect(0, height - 130, 12, 130);
 
-          // Draw Text
-          ctx.fillStyle = '#facc15'; // Yellow label
-          ctx.font = 'bold 24px sans-serif';
-          ctx.fillText(`LOGISTIK INBOUND - ${label}`, 30, height - 80);
+          ctx.fillStyle = '#38bdf8'; 
+          ctx.font = 'bold 26px sans-serif';
+          ctx.fillText(`[ INBOUND ] ${label}`, 35, height - 85);
           
-          ctx.fillStyle = '#ffffff'; // White date/time
-          ctx.font = '20px sans-serif';
-          ctx.fillText(`📅 ${dateStr}`, 30, height - 45);
-          ctx.fillText(`⏰ ${timeStr} WIB`, 30, height - 15);
+          ctx.fillStyle = '#f8fafc'; 
+          ctx.font = '22px sans-serif';
+          ctx.fillText(`📅 ${dateStr}  |  ⏰ ${timeStr} WIB`, 35, height - 40);
           
-          // Convert back to Base64 (compress to JPEG quality 0.7)
           resolve(canvas.toDataURL('image/jpeg', 0.7));
         };
         img.src = e.target.result;
@@ -219,176 +322,182 @@ function InboundForm() {
   const handlePhotoCapture = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const label = type === 'main' ? 'KONDISI MOBIL KOSONG' : 'BARANG CACAT/BAD STOCK';
     const processedBase64 = await processImage(file, label);
-    
     if (type === 'main') setMainPhoto(processedBase64);
     else setDefectPhoto(processedBase64);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!mainPhoto) {
-      alert("Foto mobil kosong (After Loading) wajib dilampirkan!");
-      return;
-    }
-
+    if (!mainPhoto) { alert("Foto mobil kosong wajib dilampirkan!"); return; }
     setIsSubmitting(true);
-
-    const payload = {
-      ...formData,
-      mainPhoto: mainPhoto,
-      defectPhoto: defectPhoto
-    };
 
     try {
       if (APPS_SCRIPT_URL === "") {
-        // DEMO MODE (Jika URL belum di set)
-        console.log("DEMO MODE PAYLOAD:", payload);
-        await new Promise(r => setTimeout(r, 2000)); // Simulasi loading
+        await new Promise(r => setTimeout(r, 1500)); 
       } else {
-        // REAL API CALL
-        const response = await fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-        });
+        const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({...formData, mainPhoto, defectPhoto}) });
         const result = await response.json();
         if (result.status !== "success") throw new Error(result.message);
       }
-
       setSuccessMsg(true);
       setTimeout(() => {
         setSuccessMsg(false);
-        // Reset form
         setFormData({ ...formData, nopol: '', customer: '', item: '', sku: '', qty: '', expDate: '' });
-        setMainPhoto(null);
-        setDefectPhoto(null);
-      }, 3000);
-
-    } catch (error) {
-      alert("Gagal menyimpan data: " + error.message);
-    } finally {
-      setIsSubmitting(false);
-    }
+        setMainPhoto(null); setDefectPhoto(null);
+      }, 2500);
+    } catch (error) { alert("Gagal: " + error.message); } finally { setIsSubmitting(false); }
   };
 
   if (successMsg) {
     return (
-      <div className="mt-10 bg-white p-8 rounded-[2rem] shadow-xl flex flex-col items-center text-center animate-fade-in">
-        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle size={50} className="text-green-500" />
+      <div className="bg-white p-8 rounded-[2.5rem] shadow-lg flex flex-col items-center text-center animate-scale-in border border-slate-100 mt-10">
+        <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-[2rem] flex items-center justify-center mb-6 shadow-[0_10px_20px_rgba(16,185,129,0.3)] rotate-3">
+          <CheckCircle size={50} className="text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">Sukses!</h2>
-        <p className="text-slate-500 mb-6">Data kedatangan barang dan foto berhasil disimpan ke sistem.</p>
+        <h2 className="text-3xl font-bold text-slate-800 mb-2 tracking-tight">Berhasil!</h2>
+        <p className="text-slate-500 font-medium leading-relaxed">Data dan foto kedatangan telah tersimpan di sistem.</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-[2rem] shadow-xl space-y-5 animate-fade-in">
+    <form onSubmit={handleSubmit} className="space-y-5 animate-slide-up" style={{ animationDelay: '0.1s' }}>
       
-      {/* Tanggal & Nopol */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-500 flex items-center gap-1"><Calendar size={12}/> Tgl Kedatangan</label>
-          <input type="date" name="date" required value={formData.date} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
-        </div>
-        <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-500 flex items-center gap-1"><Truck size={12}/> No. Polisi</label>
-          <input type="text" name="nopol" required placeholder="D 1234 ABC" value={formData.nopol} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none uppercase" />
-        </div>
-      </div>
-
-      {/* Customer */}
-      <div className="space-y-1">
-        <label className="text-xs font-bold text-slate-500 flex items-center gap-1"><User size={12}/> Customer Origin</label>
-        <select name="customer" required value={formData.customer} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none appearance-none">
-          <option value="" disabled>Pilih Customer...</option>
-          {CUSTOMERS.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-      </div>
-
-      {/* Item & SKU */}
-      <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 space-y-4">
-        <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-500 flex items-center gap-1"><Package size={12}/> Nama Item</label>
-          <select name="item" required value={formData.item} onChange={handleInputChange} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-            <option value="" disabled>Pilih Item...</option>
-            {ITEMS.map(i => <option key={i.sku} value={i.name}>{i.name}</option>)}
-          </select>
+      {/* SECTION: INFO KEDATANGAN */}
+      <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-200 space-y-4">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="bg-indigo-100 p-1.5 rounded-lg text-indigo-600"><Truck size={16}/></div>
+          <h3 className="font-bold text-slate-800 text-sm">Info Armada</h3>
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 flex items-center gap-1"><Hash size={12}/> SKU</label>
-            <input type="text" readOnly value={formData.sku} placeholder="Auto Fill" className="w-full bg-slate-100 border border-slate-200 rounded-xl px-3 py-3 text-sm text-slate-500 font-mono" />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Tanggal</label>
+            <div className="relative">
+              <input type="date" name="date" required value={formData.date} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 outline-none transition-all font-medium text-slate-700" />
+            </div>
           </div>
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 flex items-center gap-1"><ClipboardList size={12}/> Qty (Carton)</label>
-            <input type="number" name="qty" required min="1" value={formData.qty} onChange={handleInputChange} placeholder="0" className="w-full bg-white border border-slate-200 rounded-xl px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Nopol</label>
+            <input type="text" name="nopol" required placeholder="D 1234 ABC" value={formData.nopol} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 outline-none transition-all uppercase font-bold text-slate-700" />
           </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">Customer Origin</label>
+          <DropdownSearch 
+            name="customer"
+            options={CUSTOMERS}
+            value={formData.customer}
+            onChange={handleInputChange}
+            placeholder="Ketik / Pilih Customer..."
+            icon={User}
+            className="bg-slate-50 border border-slate-200 focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-400"
+          />
         </div>
       </div>
 
-      {/* Exp Date */}
-      <div className="space-y-1">
-        <label className="text-xs font-bold text-slate-500 flex items-center gap-1"><Calendar size={12}/> Exp Date Barang</label>
-        <input type="date" name="expDate" required value={formData.expDate} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
-      </div>
+      {/* SECTION: INFO BARANG */}
+      <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-[2rem] border border-indigo-100 shadow-inner space-y-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-4 opacity-5"><Package size={100} /></div>
+        <div className="flex items-center gap-2 mb-2 relative z-10">
+          <div className="bg-white p-1.5 rounded-lg text-indigo-600 shadow-sm"><Box size={16}/></div>
+          <h3 className="font-bold text-slate-800 text-sm">Detail Barang</h3>
+        </div>
 
-      <hr className="border-slate-100 border-dashed border-2" />
-
-      {/* Foto Utama (After Loading) */}
-      <div className="space-y-2">
-        <label className="text-sm font-bold text-slate-700 block">Wajib: Foto Mobil Kosong</label>
-        <p className="text-xs text-slate-400 leading-tight mb-2">Ambil foto dalam box mobil setelah semua barang diturunkan.</p>
+        <div className="space-y-1.5 relative z-20">
+          <label className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider pl-1">Nama Item</label>
+          <DropdownSearch 
+            name="item"
+            options={ITEMS.map(i => i.name)}
+            value={formData.item}
+            onChange={handleInputChange}
+            placeholder="Ketik / Pilih Item..."
+            className="bg-white border border-indigo-100 shadow-sm focus-within:ring-4 focus-within:ring-indigo-500/20 focus-within:border-indigo-400"
+          />
+        </div>
         
-        {!mainPhoto ? (
-          <label className="border-2 border-dashed border-blue-300 bg-blue-50 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-100 transition">
-            <Camera size={32} className="text-blue-500 mb-2" />
-            <span className="text-sm text-blue-600 font-semibold">Buka Kamera</span>
-            <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handlePhotoCapture(e, 'main')} />
-          </label>
-        ) : (
-          <div className="relative rounded-2xl overflow-hidden border-2 border-slate-200 shadow-sm group">
-            <img src={mainPhoto} alt="Mobil Kosong" className="w-full h-auto" />
-            <button type="button" onClick={() => setMainPhoto(null)} className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full shadow-lg">
-              <ArrowLeft size={16} />
-            </button>
+        <div className="grid grid-cols-5 gap-3 relative z-10">
+          <div className="col-span-3 space-y-1.5">
+            <label className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider pl-1">SKU Code</label>
+            <input type="text" readOnly value={formData.sku} placeholder="Otomatis" className="w-full bg-indigo-100/50 border border-transparent rounded-2xl px-4 py-3.5 text-sm text-indigo-700 font-mono font-bold" />
           </div>
-        )}
+          <div className="col-span-2 space-y-1.5">
+            <label className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider pl-1">Qty (CTN)</label>
+            <input type="number" name="qty" required min="1" value={formData.qty} onChange={handleInputChange} placeholder="0" className="w-full bg-white border border-indigo-100 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-indigo-500/20 outline-none shadow-sm font-bold text-slate-700 text-center" />
+          </div>
+        </div>
+
+        <div className="space-y-1.5 relative z-10">
+          <label className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider pl-1 flex items-center gap-1"><Calendar size={12}/> Expired Date</label>
+          <input type="date" name="expDate" required value={formData.expDate} onChange={handleInputChange} className="w-full bg-white border border-indigo-100 rounded-2xl px-4 py-3.5 text-sm focus:ring-4 focus:ring-indigo-500/20 outline-none shadow-sm font-medium text-slate-700" />
+        </div>
       </div>
 
-      {/* Foto Cacat (Optional) */}
-      <div className="space-y-2 pt-2">
-         <label className="text-sm font-bold text-slate-700 flex items-center gap-2 block"><FileWarning size={16} className="text-amber-500"/> Opsional: Foto Barang Cacat</label>
-         <p className="text-xs text-slate-400 leading-tight mb-2">Lampirkan foto jika ditemukan bad stock / kemasan rusak.</p>
-         
-         {!defectPhoto ? (
-          <label className="border-2 border-dashed border-slate-300 bg-slate-50 rounded-2xl p-4 flex gap-3 items-center cursor-pointer hover:bg-slate-100 transition">
-            <div className="bg-amber-100 p-2 rounded-full"><Camera size={20} className="text-amber-600" /></div>
-            <span className="text-sm text-slate-600 font-medium">Tambah Foto Bad Stock</span>
-            <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handlePhotoCapture(e, 'defect')} />
-          </label>
-        ) : (
-          <div className="relative rounded-2xl overflow-hidden border-2 border-amber-200 shadow-sm w-1/2">
-            <img src={defectPhoto} alt="Barang Cacat" className="w-full h-auto" />
-            <button type="button" onClick={() => setDefectPhoto(null)} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-lg">
-              <ArrowLeft size={14} />
-            </button>
+      {/* SECTION: FOTO */}
+      <div className="space-y-4">
+        {/* Foto Utama */}
+        <div className="bg-white p-4 rounded-[2rem] border border-slate-200 shadow-sm">
+          <div className="flex justify-between items-center mb-3 px-1">
+            <label className="text-sm font-bold text-slate-800 flex items-center gap-2"><Camera size={16} className="text-indigo-500"/> Foto Mobil Kosong <span className="text-red-500">*</span></label>
           </div>
-        )}
+          {!mainPhoto ? (
+            <label className="h-32 border-2 border-dashed border-indigo-200 bg-indigo-50/50 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-indigo-50 transition-colors group">
+              <div className="bg-white p-3 rounded-full shadow-sm mb-2 group-hover:scale-110 transition-transform">
+                <Camera size={24} className="text-indigo-500" />
+              </div>
+              <span className="text-xs text-indigo-600 font-bold">Ketuk untuk Foto</span>
+              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handlePhotoCapture(e, 'main')} />
+            </label>
+          ) : (
+            <div className="relative rounded-3xl overflow-hidden border-4 border-white shadow-md group">
+              <img src={mainPhoto} alt="Mobil Kosong" className="w-full h-40 object-cover" />
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+              <button type="button" onClick={() => setMainPhoto(null)} className="absolute top-3 right-3 bg-red-500/90 backdrop-blur-sm text-white p-2.5 rounded-full shadow-lg hover:scale-110 transition-transform">
+                <ArrowLeft size={16} strokeWidth={3} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Foto Cacat */}
+        <div className="bg-white p-4 rounded-[2rem] border border-slate-200 shadow-sm">
+          <div className="flex justify-between items-center mb-3 px-1">
+             <label className="text-sm font-bold text-slate-800 flex items-center gap-2"><FileWarning size={16} className="text-amber-500"/> Bad Stock (Opsional)</label>
+          </div>
+          {!defectPhoto ? (
+            <label className="h-16 border-2 border-dashed border-slate-200 bg-slate-50 rounded-2xl flex gap-3 items-center justify-center cursor-pointer hover:bg-slate-100 transition-colors group">
+              <Camera size={18} className="text-slate-400 group-hover:text-amber-500 transition-colors" />
+              <span className="text-xs text-slate-500 font-semibold group-hover:text-amber-600 transition-colors">Tambah Foto Cacat</span>
+              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => handlePhotoCapture(e, 'defect')} />
+            </label>
+          ) : (
+            <div className="relative rounded-2xl overflow-hidden border-2 border-amber-200 shadow-sm w-32">
+              <img src={defectPhoto} alt="Barang Cacat" className="w-full h-24 object-cover" />
+              <button type="button" onClick={() => setDefectPhoto(null)} className="absolute top-1.5 right-1.5 bg-red-500 text-white p-1.5 rounded-full shadow-lg">
+                <ArrowLeft size={12} strokeWidth={3} />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Submit Button */}
-      <button 
-        type="submit" 
-        disabled={isSubmitting}
-        className={`w-full py-4 mt-6 rounded-2xl font-bold text-white text-lg shadow-lg flex items-center justify-center gap-2 transition-all ${isSubmitting ? 'bg-slate-400' : 'bg-blue-600 hover:bg-blue-700 active:scale-95 shadow-blue-600/30'}`}
-      >
-        {isSubmitting ? <><Loader2 className="animate-spin" /> Mengunggah Data...</> : <><Upload /> Submit Inbound</>}
-      </button>
+      <div className="pt-2">
+        <button 
+          type="submit" 
+          disabled={isSubmitting}
+          className={`w-full py-4 rounded-2xl font-extrabold text-white text-lg flex items-center justify-center gap-2 transition-all duration-300 relative overflow-hidden ${isSubmitting ? 'bg-slate-400 scale-[0.98]' : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:shadow-[0_15px_30px_-5px_rgba(79,70,229,0.4)] active:scale-[0.97]'}`}
+        >
+          {isSubmitting ? (
+             <><Loader2 className="animate-spin" /> MENGUNGGAH...</>
+          ) : (
+             <><Upload size={20} className="mb-0.5" /> SUBMIT DATA</>
+          )}
+        </button>
+      </div>
 
     </form>
   );
@@ -401,78 +510,74 @@ function HistoryScreen() {
   const [historyData, setHistoryData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchHistory();
-  }, []);
+  useEffect(() => { fetchHistory(); }, []);
 
   const fetchHistory = async () => {
     setIsLoading(true);
     try {
       if (APPS_SCRIPT_URL === "") {
-        // DEMO DATA
         setTimeout(() => {
           setHistoryData([
             { timestamp: '08/04/2026 10:30', nopol: 'D 1992 XYZ', customer: 'DIKICHI BANDUNG FRESH', item: 'Ayam Broiler Utuh Grade A', qty: '150' },
             { timestamp: '08/04/2026 09:15', nopol: 'B 1234 BQ', customer: 'GACOAN BANDUNG FRESH', item: 'Sayap Ayam (Wings)', qty: '80' },
-            { timestamp: '07/04/2026 15:45', nopol: 'D 9988 AA', customer: 'BENFARM BANDUNG FRESH', item: 'Paha Atas', qty: '200' },
           ]);
           setIsLoading(false);
-        }, 1500);
+        }, 1000);
       } else {
         const response = await fetch(APPS_SCRIPT_URL + "?action=getHistory");
         const data = await response.json();
         setHistoryData(data.data || []);
         setIsLoading(false);
       }
-    } catch (error) {
-      console.error(error);
-      setIsLoading(false);
-    }
+    } catch (error) { setIsLoading(false); }
   };
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 size={40} className="text-blue-500 animate-spin mb-4" />
-        <p className="text-slate-500 font-medium">Memuat Riwayat...</p>
+      <div className="flex flex-col items-center justify-center py-32 animate-fade-in">
+        <div className="bg-white p-4 rounded-3xl shadow-lg shadow-indigo-500/10 mb-4 animate-bounce">
+           <Loader2 size={32} className="text-indigo-500 animate-spin" />
+        </div>
+        <p className="text-slate-500 font-bold tracking-widest text-xs uppercase">Menyinkronkan...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 animate-fade-in pb-10">
-      <div className="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center mb-6">
+    <div className="space-y-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+      <div className="flex justify-between items-end mb-6 px-1 mt-2">
         <div>
-          <h2 className="font-bold text-slate-800">Riwayat Terkini</h2>
-          <p className="text-xs text-slate-500">20 Transaksi terakhir</p>
+          <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">Log Terkini</h2>
+          <p className="text-xs text-slate-500 font-medium">20 Inbound terakhir</p>
         </div>
-        <button onClick={fetchHistory} className="bg-blue-50 text-blue-600 p-2 rounded-xl text-sm font-semibold hover:bg-blue-100">Refresh</button>
+        <button onClick={fetchHistory} className="bg-white px-4 py-2 rounded-xl text-xs font-bold text-indigo-600 shadow-sm border border-slate-200 hover:bg-indigo-50 active:scale-95 transition-all">Refresh</button>
       </div>
 
       {historyData.map((item, index) => (
-        <div key={index} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
-          <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
-          <div className="flex justify-between items-start mb-3">
+        <div key={index} className="bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm relative overflow-hidden group hover:border-indigo-300 transition-colors animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
+          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-indigo-400 to-blue-500"></div>
+          
+          <div className="flex justify-between items-start mb-4 pl-2">
             <div>
-              <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-md mb-2 inline-block">
+              <span className="bg-indigo-50 text-indigo-600 text-[9px] font-extrabold tracking-wider px-2.5 py-1 rounded-full mb-2 inline-block border border-indigo-100">
                 {item.timestamp}
               </span>
-              <h3 className="font-bold text-slate-800 text-sm leading-tight">{item.customer}</h3>
+              <h3 className="font-extrabold text-slate-800 text-sm leading-tight pr-2">{item.customer}</h3>
             </div>
-            <div className="bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg text-center">
-              <p className="text-[10px] text-blue-500 font-semibold uppercase">Nopol</p>
-              <p className="font-bold text-blue-700 text-sm">{item.nopol}</p>
+            <div className="bg-slate-800 text-white px-3 py-1.5 rounded-xl text-center shadow-md">
+              <p className="text-[8px] text-slate-300 font-bold uppercase tracking-wider">Armada</p>
+              <p className="font-black text-sm">{item.nopol}</p>
             </div>
           </div>
           
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between">
+          <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex items-center justify-between ml-2">
             <div className="flex items-center gap-3">
-              <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-100">
-                <Package size={16} className="text-slate-400" />
+              <div className="bg-white shadow-sm border border-slate-100 p-2.5 rounded-xl text-indigo-500">
+                <Package size={18} />
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-700">{item.item}</p>
-                <p className="text-[10px] text-slate-500">QTY: <span className="font-bold text-slate-700">{item.qty} CTN</span></p>
+                <p className="text-xs font-bold text-slate-700 leading-tight">{item.item}</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Jumlah: <span className="font-extrabold text-indigo-600 bg-indigo-50 px-1.5 rounded text-[11px] ml-1">{item.qty} CTN</span></p>
               </div>
             </div>
           </div>
@@ -480,9 +585,11 @@ function HistoryScreen() {
       ))}
 
       {historyData.length === 0 && (
-         <div className="text-center py-10">
-           <ClipboardList size={48} className="text-slate-300 mx-auto mb-3" />
-           <p className="text-slate-500">Belum ada data Inbound.</p>
+         <div className="text-center py-20 bg-slate-50 rounded-[2rem] border border-dashed border-slate-300 mt-4">
+           <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-slate-100">
+             <ClipboardList size={28} className="text-slate-300" />
+           </div>
+           <p className="text-slate-500 font-medium text-sm">Belum ada data masuk hari ini.</p>
          </div>
       )}
     </div>
