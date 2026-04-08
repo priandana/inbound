@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Camera, History, Box, Upload, FileWarning, CheckCircle, Package, Truck, Calendar, Key, User, ClipboardList, Loader2, ArrowLeft, ChevronRight, Sparkles, ChevronDown } from 'lucide-react';
 
 // --- KONFIGURASI ---
-// GANTI URL DI BAWAH INI DENGAN URL WEB APP ANDA!
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxeoOK8BxfrT2Guk3GGh70v15IITYZYQCOA4K_ek3c8n3BkQ080z4Buqyp0DT9prNi6Mw/exec"; 
 const APP_PIN = "123456";
 
@@ -563,10 +562,7 @@ function HistoryScreen() {
     try {
       if (APPS_SCRIPT_URL === "") {
         setTimeout(() => {
-          setHistoryData([
-            { timestamp: '08/04/2026 10:30', nopol: 'D 1992 XYZ', customer: 'DIKICHI BANDUNG FRESH', item: 'BEEF PATTY DKC 70 G', qty: '150' },
-            { timestamp: '08/04/2026 09:15', nopol: 'B 1234 BQ', customer: 'GACOAN BANDUNG FRESH', item: 'AYAM CINCANG (V20)', qty: '80' },
-          ]);
+          setHistoryData([]);
           setIsLoading(false);
         }, 1000);
       } else {
@@ -627,6 +623,22 @@ function HistoryScreen() {
               </div>
             </div>
           </div>
+
+          {/* Menampilkan Tombol Foto jika link foto tersedia dari Google Sheets */}
+          {(item.mainPhotoUrl || item.defectPhotoUrl) && (
+            <div className="mt-4 pt-3 border-t border-slate-100/60 flex gap-2 ml-2">
+               {item.mainPhotoUrl && (
+                 <a href={item.mainPhotoUrl} target="_blank" rel="noopener noreferrer" className="flex-1 flex justify-center items-center gap-1.5 bg-red-50 text-red-600 px-3 py-2 rounded-xl text-[10px] font-bold hover:bg-red-100 transition-colors border border-red-100/50">
+                   <Camera size={14} /> Lihat Mobil
+                 </a>
+               )}
+               {item.defectPhotoUrl && (
+                 <a href={item.defectPhotoUrl} target="_blank" rel="noopener noreferrer" className="flex-1 flex justify-center items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-2 rounded-xl text-[10px] font-bold hover:bg-amber-100 transition-colors border border-amber-100/50">
+                   <FileWarning size={14} /> Bad Stock
+                 </a>
+               )}
+            </div>
+          )}
         </div>
       ))}
 
@@ -635,7 +647,7 @@ function HistoryScreen() {
            <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-slate-100">
              <ClipboardList size={28} className="text-slate-300" />
            </div>
-           <p className="text-slate-500 font-medium text-sm">Belum ada data masuk hari ini.</p>
+           <p className="text-slate-500 font-medium text-sm">Belum ada data masuk.</p>
          </div>
       )}
     </div>
