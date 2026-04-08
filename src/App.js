@@ -3,7 +3,7 @@ import { Camera, History, Box, Upload, FileWarning, CheckCircle, Package, Truck,
 
 // --- KONFIGURASI ---
 // GANTI URL DI BAWAH INI DENGAN URL WEB APP ANDA!
-const APPS_SCRIPT_URL = ""; 
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxeoOK8BxfrT2Guk3GGh70v15IITYZYQCOA4K_ek3c8n3BkQ080z4Buqyp0DT9prNi6Mw/exec"; 
 const APP_PIN = "123456";
 
 // Data Master
