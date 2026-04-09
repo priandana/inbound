@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './index.css';
+// Pastikan nama file CSS di bawah ini sesuai dengan milik Anda (index.css atau globals.css)
+import './index.css'; 
 
 // --- DATA SEMENTARA (Sesuai Spreadsheet Anda) ---
 const CUSTOMERS = ["DIKICHI BANDUNG FRESH", "GACOAN BANDUNG FRESH", "BENFARM BANDUNG FRESH"];
@@ -26,7 +27,7 @@ export default function App() {
   const [sku, setSku] = useState('');
   const [qty, setQty] = useState('');
   const [expDate, setExpDate] = useState('');
-  const [keterangan, setKeterangan] = useState(''); // STATE KETERANGAN BARU
+  const [keterangan, setKeterangan] = useState(''); 
 
   // --- STATE FOTO ---
   const [mainPhoto, setMainPhoto] = useState(null);
@@ -79,7 +80,7 @@ export default function App() {
       sku,
       qty,
       expDate,
-      keterangan, // KIRIM KETERANGAN KE BACKEND
+      keterangan, 
       mainPhoto,
       defectPhoto
     };
@@ -91,14 +92,13 @@ export default function App() {
       const response = await fetch(scriptUrl, {
         method: 'POST',
         body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' } // Penting untuk GAS
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
       });
 
       const result = await response.json();
 
       if (result.status === 'success') {
         alert('Sukses! Data dan foto berhasil disimpan ke Gudang Utama.');
-        // Reset Form
         setDate(''); setNopol(''); setSelectedCustomer(''); setSelectedItem('');
         setSku(''); setQty(''); setExpDate(''); setKeterangan('');
         setMainPhoto(null); setDefectPhoto(null);
@@ -133,7 +133,6 @@ export default function App() {
     }
   };
 
-  // Muat riwayat saat tab history dibuka
   useEffect(() => {
     if (activeTab === 'history') {
       fetchHistory();
@@ -144,7 +143,7 @@ export default function App() {
     <div className="min-h-screen bg-gray-50 flex justify-center items-start md:py-10 font-sans text-gray-800">
       <div className="w-full max-w-md bg-gray-50 md:rounded-[40px] md:shadow-2xl overflow-hidden relative min-h-screen md:min-h-[850px] flex flex-col">
         
-        {/* HEADER TEMA MERAH */}
+        {/* HEADER */}
         <div className="bg-gradient-to-b from-red-600 to-red-700 px-6 pt-12 pb-16 rounded-b-[40px] shadow-lg relative z-10">
           <div className="flex justify-between items-center mb-6">
             <div>
@@ -154,7 +153,6 @@ export default function App() {
               </p>
               <h1 className="text-3xl font-black text-white tracking-tight">Inbound Hub</h1>
             </div>
-            {/* Tombol Logout */}
             <button onClick={() => setShowLogoutConfirm(true)} className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white hover:bg-white/30 transition shadow-sm border border-white/10">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
             </button>
@@ -165,16 +163,17 @@ export default function App() {
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 mb-1 tracking-wider">TANGGAL</label>
-                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[50px]"/>
+                  {/* Perbaikan text-[16px] dan text-gray-800 untuk menghindari zoom dan warna putih di iOS */}
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[50px] appearance-none"/>
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 mb-1 tracking-wider">NOPOL</label>
-                  <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 uppercase block min-h-[50px]"/>
+                  <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 uppercase block min-h-[50px]"/>
                 </div>
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-gray-400 mb-1 tracking-wider">CUSTOMER ORIGIN</label>
-                <select value={selectedCustomer} onChange={(e) => { setSelectedCustomer(e.target.value); setSelectedItem(''); setSku(''); }} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 appearance-none min-h-[50px]">
+                <select value={selectedCustomer} onChange={(e) => { setSelectedCustomer(e.target.value); setSelectedItem(''); setSku(''); }} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 appearance-none min-h-[50px]">
                   <option value="">Pilih Customer...</option>
                   {CUSTOMERS.map((c, i) => <option key={i} value={c}>{c}</option>)}
                 </select>
@@ -186,19 +185,18 @@ export default function App() {
                 <h2 className="text-xl font-bold text-white">Log Terkini</h2>
                 <p className="text-red-200 text-xs">20 Inbound terakhir</p>
               </div>
-              <button onClick={fetchHistory} className="bg-white text-red-600 px-4 py-2 rounded-xl text-sm font-bold shadow-sm flex items-center gap-2">
+              <button onClick={fetchHistory} className="bg-white text-red-600 px-4 py-2 rounded-xl text-[16px] font-bold shadow-sm flex items-center gap-2">
                 Refresh
               </button>
             </div>
           )}
         </div>
 
-        {/* AREA KONTEN (SCROLLABLE) */}
+        {/* AREA KONTEN */}
         <div className="flex-1 overflow-y-auto px-6 pb-32 pt-36 bg-gray-50 custom-scrollbar">
           
           {activeTab === 'form' ? (
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Box Detail Barang */}
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-red-50 relative overflow-hidden">
                 <svg className="absolute -right-6 -top-6 w-32 h-32 text-red-50 opacity-50" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16.5C21 16.88 20.79 17.21 20.47 17.38L12.57 21.82C12.41 21.94 12.21 22 12 22C11.79 22 11.59 21.94 11.43 21.82L3.53 17.38C3.21 17.21 3 16.88 3 16.5V7.5C3 7.12 3.21 6.79 3.53 6.62L11.43 2.18C11.59 2.06 11.79 2 12 2C12.21 2 12.41 2.06 12.57 2.18L20.47 6.62C20.79 6.79 21 7.12 21 7.5V16.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path></svg>
                 
@@ -212,7 +210,7 @@ export default function App() {
                 <div className="space-y-4 relative z-10">
                   <div>
                     <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider">NAMA ITEM</label>
-                    <select value={selectedItem} onChange={(e) => handleItemChange(e.target.value)} disabled={!selectedCustomer} className="w-full bg-white border border-red-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 appearance-none min-h-[50px] disabled:bg-gray-50 disabled:text-gray-400">
+                    <select value={selectedItem} onChange={(e) => handleItemChange(e.target.value)} disabled={!selectedCustomer} className="w-full bg-white border border-red-100 rounded-xl px-4 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 appearance-none min-h-[50px] disabled:bg-gray-50 disabled:text-gray-400">
                       <option value="">{selectedCustomer ? "Pilih Item..." : "Pilih Customer Dulu"}</option>
                       {filteredItems.map((i, idx) => <option key={idx} value={i.item}>{i.item}</option>)}
                     </select>
@@ -221,17 +219,18 @@ export default function App() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider">SKU CODE</label>
-                      <input type="text" value={sku} readOnly placeholder="Otomatis" className="w-full bg-red-50/50 border border-transparent rounded-xl px-3 py-3 text-sm font-mono text-gray-500 block min-h-[50px]" />
+                      <input type="text" value={sku} readOnly placeholder="Otomatis" className="w-full bg-red-50/50 border border-transparent rounded-xl px-3 py-3 text-[16px] font-mono text-gray-500 block min-h-[50px]" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider">QTY (CTN)</label>
-                      <input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="0" className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 font-bold block min-h-[50px]"/>
+                      <input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="0" className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 font-bold block min-h-[50px]"/>
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider">EXPIRED DATE</label>
-                    <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[50px]"/>
+                    {/* Perbaikan text-[16px] dan text-gray-800 */}
+                    <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[50px] appearance-none"/>
                   </div>
                 </div>
               </div>
@@ -282,7 +281,7 @@ export default function App() {
                 )}
               </div>
 
-              {/* TAMBAHAN KOTAK KETERANGAN */}
+              {/* Box Keterangan */}
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-red-50 mt-4">
                 <div className="flex items-center gap-2 mb-4">
                   <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
@@ -292,11 +291,10 @@ export default function App() {
                   value={keterangan}
                   onChange={(e) => setKeterangan(e.target.value)}
                   placeholder="Contoh: Kemasan sobek, ayam berbau..."
-                  className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[80px]"
+                  className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[80px]"
                 />
               </div>
 
-              {/* Tombol Submit Besar */}
               <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white font-black text-lg py-5 rounded-2xl shadow-xl shadow-red-600/30 active:scale-[0.98] transition-transform disabled:opacity-70 disabled:cursor-not-allowed mt-8 flex justify-center items-center gap-3">
                 {isLoading ? (
                   <><svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> MENGUNGGAH...</>
@@ -312,7 +310,7 @@ export default function App() {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
                 </div>
               ) : historyError ? (
-                <div className="bg-red-50 text-red-500 p-4 rounded-xl text-center text-sm font-bold border border-red-200">
+                <div className="bg-red-50 text-red-500 p-4 rounded-xl text-center text-[16px] font-bold border border-red-200">
                   {historyError}
                 </div>
               ) : historyData.length === 0 ? (
@@ -334,7 +332,6 @@ export default function App() {
                     <p className="text-sm font-medium text-gray-600">{data.item}</p>
                     <p className="text-xs text-gray-400 mt-1">{data.customer}</p>
 
-                    {/* MENAMPILKAN KETERANGAN JIKA ADA */}
                     {data.keterangan && (
                       <div className="mt-3 bg-yellow-50 border border-yellow-200 p-3 rounded-xl flex items-start gap-2">
                         <svg className="w-4 h-4 text-yellow-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -342,7 +339,6 @@ export default function App() {
                       </div>
                     )}
 
-                    {/* Tombol Lihat Foto */}
                     <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
                       {data.mainPhotoUrl && (
                         <a href={data.mainPhotoUrl} target="_blank" rel="noreferrer" className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold py-2 rounded-xl text-center transition">Lihat Mobil</a>
@@ -358,7 +354,7 @@ export default function App() {
           )}
         </div>
 
-        {/* BOTTOM NAVIGATION FIXED */}
+        {/* BOTTOM NAVIGATION */}
         <div className="absolute bottom-6 left-6 right-6">
           <div className="bg-white/90 backdrop-blur-xl p-2 rounded-3xl shadow-2xl flex border border-gray-100">
             <button onClick={() => setActiveTab('form')} className={`flex-1 py-3 flex flex-col items-center gap-1 rounded-2xl font-bold text-[11px] transition-all ${activeTab === 'form' ? 'bg-red-50 text-red-600' : 'text-gray-400 hover:text-gray-600'}`}>
@@ -372,7 +368,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Modal Konfirmasi Logout */}
+        {/* Modal Logout */}
         {showLogoutConfirm && (
           <div className="absolute inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
             <div className="bg-white rounded-3xl p-6 shadow-2xl w-full max-w-sm scale-100 transition-transform">
