@@ -305,11 +305,11 @@ export default function App() {
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 mb-1 tracking-wider uppercase">Tanggal</label>
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-[15px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[46px] appearance-none"/>
+                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[46px] appearance-none"/>
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 mb-1 tracking-wider uppercase">Nopol</label>
-                    <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-[15px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 uppercase block min-h-[46px]"/>
+                    <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 uppercase block min-h-[46px]"/>
                   </div>
                 </div>
                 
@@ -348,17 +348,17 @@ export default function App() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider uppercase">SKU Code</label>
-                      <input type="text" value={sku} readOnly placeholder="Otomatis" className="w-full bg-red-50/50 border border-transparent rounded-xl px-3 py-3 text-[15px] font-mono text-gray-500 block min-h-[46px]" />
+                      <input type="text" value={sku} readOnly placeholder="Otomatis" className="w-full bg-red-50/50 border border-transparent rounded-xl px-3 py-3 text-[16px] font-mono text-gray-500 block min-h-[46px]" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider uppercase">QTY (CTN)</label>
-                      <input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="0" className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-[15px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 font-bold block min-h-[46px]"/>
+                      <input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="0" className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 font-bold block min-h-[46px]"/>
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider uppercase">Expired Date</label>
-                    <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-[15px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[46px] appearance-none"/>
+                    <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[46px] appearance-none"/>
                   </div>
                 </div>
               </div>
@@ -419,7 +419,7 @@ export default function App() {
                   value={keterangan}
                   onChange={(e) => setKeterangan(e.target.value)}
                   placeholder="Contoh: Kemasan sobek, ayam berbau..."
-                  className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-[15px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[70px]"
+                  className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[70px]"
                 />
               </div>
 
