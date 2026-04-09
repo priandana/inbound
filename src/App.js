@@ -41,6 +41,16 @@ const ITEMS = [
   { customer: "BENFARM BANDUNG FRESH", item: "DEBEZ MAKARONI PEDAS GORENG 300GR", sku: "BEN-00000126" }
 ];
 
+// --- FUNGSI MENGUBAH LINK DRIVE MENJADI LINK GAMBAR LANGSUNG ---
+const getDriveDirectUrl = (driveUrl) => {
+  if (!driveUrl) return '';
+  const match = driveUrl.match(/\/d\/(.+?)\//);
+  if (match && match[1]) {
+    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+  }
+  return driveUrl; 
+};
+
 // --- KOMPONEN DROPDOWN CUSTOM KEREN ---
 const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,7 +63,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
         setIsOpen(false);
-        setSearch(value); // Kembalikan ke value asli jika klik keluar
+        setSearch(value); 
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -110,7 +120,7 @@ export default function App() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- STATE FORM ---
+  // --- STATE FORM & FOTO ---
   const [date, setDate] = useState('');
   const [nopol, setNopol] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState('');
@@ -119,13 +129,14 @@ export default function App() {
   const [qty, setQty] = useState('');
   const [expDate, setExpDate] = useState('');
   const [keterangan, setKeterangan] = useState(''); 
-
   const [mainPhoto, setMainPhoto] = useState(null);
   const [defectPhoto, setDefectPhoto] = useState(null);
   
+  // --- STATE HISTORY & PREVIEW MODAL ---
   const [historyData, setHistoryData] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState('');
+  const [previewImage, setPreviewImage] = useState(null); // Menyimpan URL gambar yang sedang di-preview
 
   const mainPhotoInputRef = useRef(null);
   const defectPhotoInputRef = useRef(null);
@@ -135,7 +146,7 @@ export default function App() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (pinInput === '123456') { // PIN DEFAULT APLIKASI
+    if (pinInput === '123456') { 
       setIsAuthenticated(true);
       setPinError(false);
       setPinInput('');
@@ -148,7 +159,6 @@ export default function App() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setShowLogoutConfirm(false);
-    // Reset form jika diperlukan saat logout
     setDate(''); setNopol(''); setSelectedCustomer(''); setSelectedItem('');
     setSku(''); setQty(''); setExpDate(''); setKeterangan('');
     setMainPhoto(null); setDefectPhoto(null);
@@ -187,7 +197,6 @@ export default function App() {
     const payload = { date, nopol, customer: selectedCustomer, item: selectedItem, sku, qty, expDate, keterangan, mainPhoto, defectPhoto };
 
     try {
-      // PASTIKAN LINK INI SESUAI DENGAN WEB APP ANDA
       const scriptUrl = 'https://script.google.com/macros/s/AKfycbxeoOK8BxfrT2Guk3GGh70v15IITYZYQCOA4K_ek3c8n3BkQ080z4Buqyp0DT9prNi6Mw/exec';
       const response = await fetch(scriptUrl, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
       const result = await response.json();
@@ -287,7 +296,6 @@ export default function App() {
           </div>
 
           {activeTab === 'form' ? (
-            // Form Top Box - Ditambahkan z-30 agar dropdown menumpuk elemen di bawahnya
             <div className="bg-white rounded-3xl p-6 shadow-xl border border-red-50 mt-4 absolute w-[calc(100%-3rem)] top-28 left-6 z-30">
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
@@ -302,7 +310,6 @@ export default function App() {
               
               <div>
                 <label className="block text-[10px] font-bold text-gray-400 mb-1 tracking-wider">CUSTOMER ORIGIN</label>
-                {/* IMPLEMENTASI CUSTOM DROPDOWN CUSTOMER */}
                 <CustomSelect 
                   value={selectedCustomer}
                   options={CUSTOMERS}
@@ -312,7 +319,7 @@ export default function App() {
               </div>
             </div>
           ) : (
-            <div className="mt-4 flex justify-between items-end absolute w-[calc(100%-3rem)] top-28 left-6">
+            <div className="mt-4 flex justify-between items-end absolute w-[calc(100%-3rem)] top-28 left-6 z-20">
               <div>
                 <h2 className="text-xl font-bold text-white">Log Terkini</h2>
                 <p className="text-red-200 text-xs">20 Inbound terakhir</p>
@@ -329,10 +336,7 @@ export default function App() {
           {activeTab === 'form' ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               
-              {/* Box Detail Barang */}
-              {/* Penting: Dihapus overflow-hidden agar dropdown item tidak kepotong! */}
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-red-50 relative">
-                {/* Background SVG SVG */}
                 <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
                   <svg className="absolute -right-6 -top-6 w-32 h-32 text-red-50 opacity-50" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16.5C21 16.88 20.79 17.21 20.47 17.38L12.57 21.82C12.41 21.94 12.21 22 12 22C11.79 22 11.59 21.94 11.43 21.82L3.53 17.38C3.21 17.21 3 16.88 3 16.5V7.5C3 7.12 3.21 6.79 3.53 6.62L11.43 2.18C11.59 2.06 11.79 2 12 2C12.21 2 12.41 2.06 12.57 2.18L20.47 6.62C20.79 6.79 21 7.12 21 7.5V16.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path></svg>
                 </div>
@@ -347,7 +351,6 @@ export default function App() {
                 <div className="space-y-4 relative z-20">
                   <div>
                     <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider">NAMA ITEM</label>
-                    {/* IMPLEMENTASI CUSTOM DROPDOWN ITEM */}
                     <CustomSelect 
                       value={selectedItem}
                       options={itemOptions}
@@ -375,7 +378,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Box Foto Mobil */}
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-red-50 relative z-10">
                 <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
                   <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -398,7 +400,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* Box Foto Cacat */}
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-red-50 relative z-10">
                 <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
                   <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -421,7 +422,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* Box Keterangan */}
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-red-50 mt-4 relative z-10">
                 <div className="flex items-center gap-2 mb-4">
                   <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
@@ -479,12 +479,13 @@ export default function App() {
                       </div>
                     )}
 
+                    {/* PERUBAHAN DI SINI: Tombol tidak membuka link baru, melainkan memanggil Modal */}
                     <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
                       {data.mainPhotoUrl && (
-                        <a href={data.mainPhotoUrl} target="_blank" rel="noreferrer" className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold py-2 rounded-xl text-center transition">Lihat Mobil</a>
+                        <button type="button" onClick={() => setPreviewImage(getDriveDirectUrl(data.mainPhotoUrl))} className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold py-2 rounded-xl text-center transition">Lihat Mobil</button>
                       )}
                       {data.defectPhotoUrl && (
-                        <a href={data.defectPhotoUrl} target="_blank" rel="noreferrer" className="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-600 text-xs font-bold py-2 rounded-xl text-center transition">Bad Stock</a>
+                        <button type="button" onClick={() => setPreviewImage(getDriveDirectUrl(data.defectPhotoUrl))} className="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-600 text-xs font-bold py-2 rounded-xl text-center transition">Bad Stock</button>
                       )}
                     </div>
                   </div>
@@ -523,6 +524,22 @@ export default function App() {
                 <button onClick={handleLogout} className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-600/30 hover:bg-red-700 transition">Keluar</button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* MODAL PREVIEW FOTO (FITUR BARU) */}
+        {previewImage && (
+          <div className="absolute inset-0 z-[60] bg-gray-900/90 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
+            {/* Tombol Close */}
+            <button onClick={() => setPreviewImage(null)} className="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            {/* Gambar */}
+            <div className="w-full max-w-sm bg-transparent rounded-2xl overflow-hidden shadow-2xl relative">
+               <img src={previewImage} alt="Preview Mobil/Barang" className="w-full h-auto max-h-[70vh] object-contain rounded-2xl" />
+            </div>
+            <p className="text-white/70 text-sm mt-4 font-medium">Ketuk X untuk menutup</p>
           </div>
         )}
 
