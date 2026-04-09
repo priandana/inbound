@@ -142,7 +142,7 @@ export default function App() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (pinInput === '123456') { 
+    if (pinInput === '1234') { 
       setIsAuthenticated(true); setPinError(false); setPinInput('');
     } else { setPinError(true); setPinInput(''); }
   };
