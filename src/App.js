@@ -129,6 +129,9 @@ export default function App() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState('');
   
+  // FITUR BARU: State untuk pencarian riwayat
+  const [searchHistory, setSearchHistory] = useState('');
+
   const [previewImage, setPreviewImage] = useState(null); 
   const mainPhotoInputRef = useRef(null);
   const defectPhotoInputRef = useRef(null);
@@ -152,7 +155,7 @@ export default function App() {
     setIsAuthenticated(false); setShowLogoutConfirm(false);
     setDate(''); setNopol(''); setSelectedCustomer(''); 
     setSelectedItem(''); setSku(''); setQty(''); setExpDate(''); setKeterangan('');
-    setMainPhoto(null); setDefectPhoto(null); setCart([]); 
+    setMainPhoto(null); setDefectPhoto(null); setCart([]); setSearchHistory('');
   };
 
   const handleItemSelect = (itemName) => {
@@ -161,16 +164,39 @@ export default function App() {
     if (foundItem) setSku(foundItem.sku); else setSku('');
   };
 
+  // FITUR BARU: KOMPRESI FOTO OTOMATIS (CANVAS API)
   const handlePhotoCapture = (e, type) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (type === 'main') setMainPhoto(reader.result);
-        if (type === 'defect') setDefectPhoto(reader.result);
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 1024; // Kompres ukuran max lebar 1024px
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Kompresi kualitas gambar (0.6 = 60% kualitas)
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+
+        if (type === 'main') setMainPhoto(compressedBase64);
+        if (type === 'defect') setDefectPhoto(compressedBase64);
       };
-      reader.readAsDataURL(file);
-    }
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleAddToCart = () => {
@@ -262,6 +288,12 @@ export default function App() {
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
+  // Implementasi Filter Pencarian Riwayat
+  const filteredHistoryData = historyData.filter(group => {
+    const term = searchHistory.toLowerCase();
+    return group.nopol.toLowerCase().includes(term) || group.customer.toLowerCase().includes(term);
+  });
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-200 flex justify-center items-center font-sans text-gray-800 md:p-4">
@@ -307,7 +339,7 @@ export default function App() {
         <div className="bg-gradient-to-b from-red-600 to-red-700 px-6 pt-10 pb-6 rounded-b-[30px] shadow-sm relative z-20 flex-shrink-0">
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-red-200 text-[10px] font-bold tracking-wider mb-1 flex items-center gap-1 uppercase"><svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg> B-Log Cold</p>
+              <p className="text-red-200 text-[10px] font-bold tracking-wider mb-1 flex items-center gap-1 uppercase"><svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg> Gudang Utama</p>
               <h1 className="text-2xl font-black text-white tracking-tight">Inbound Hub</h1>
             </div>
             <button onClick={() => setShowLogoutConfirm(true)} className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white hover:bg-white/30 transition shadow-sm border border-white/10"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></button>
@@ -365,7 +397,6 @@ export default function App() {
                     <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[46px] appearance-none"/>
                   </div>
                   
-                  {/* FIX TYPO: DITAMBAH TANDA ">" PADA TAG SVG DI BAWAH INI */}
                   <button type="button" onClick={handleAddToCart} className="w-full mt-2 bg-white border-2 border-red-600 text-red-600 hover:bg-red-50 font-bold text-sm py-3 rounded-xl active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg> Tambah ke Truk
                   </button>
@@ -446,14 +477,26 @@ export default function App() {
                 <button onClick={fetchHistory} className="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1 active:scale-95 transition-transform"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Refresh</button>
               </div>
 
+              {/* FITUR BARU: SEARCH BAR HISTORY */}
+              <div className="relative mb-4">
+                <input 
+                  type="text" 
+                  placeholder="Cari Nopol atau Customer..." 
+                  value={searchHistory} 
+                  onChange={(e) => setSearchHistory(e.target.value)} 
+                  className="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 shadow-sm"
+                />
+                <svg className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              </div>
+
               {isLoadingHistory ? (
                 <div className="flex justify-center py-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div></div>
               ) : historyError ? (
                 <div className="bg-red-50 text-red-500 p-4 rounded-xl text-center text-sm font-bold border border-red-200">{historyError}</div>
-              ) : historyData.length === 0 ? (
-                <div className="text-center py-10 text-gray-400 bg-white rounded-3xl border border-dashed border-gray-200"><svg className="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg><p className="text-sm">Belum ada data masuk.</p></div>
+              ) : filteredHistoryData.length === 0 ? (
+                <div className="text-center py-10 text-gray-400 bg-white rounded-3xl border border-dashed border-gray-200"><svg className="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg><p className="text-sm">Data tidak ditemukan.</p></div>
               ) : (
-                historyData.map((group, index) => (
+                filteredHistoryData.map((group, index) => (
                   <div key={index} className="bg-white p-4 rounded-2xl shadow-sm border border-red-50 relative overflow-hidden group">
                     <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
                     
