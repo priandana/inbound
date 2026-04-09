@@ -1,21 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
-// Pastikan nama file CSS di bawah ini sesuai dengan milik Anda (index.css atau globals.css)
 import './index.css'; 
 
-// --- DATA SEMENTARA (Sesuai Spreadsheet Anda) ---
+// --- DATA MASTER ASLI (Sesuai Spreadsheet Anda) ---
 const CUSTOMERS = ["DIKICHI BANDUNG FRESH", "GACOAN BANDUNG FRESH", "BENFARM BANDUNG FRESH"];
 const ITEMS = [
+  // DIKICHI
   { customer: "DIKICHI BANDUNG FRESH", item: "BEEF PATTY DKC 70 G", sku: "110193" },
   { customer: "DIKICHI BANDUNG FRESH", item: "BONELESS PAHA DKC 70 G REG", sku: "110206" },
   { customer: "DIKICHI BANDUNG FRESH", item: "BUN 4 INCH NON WIJEN", sku: "110116" },
+  { customer: "DIKICHI BANDUNG FRESH", item: "FRENCH FRIES SNOW VALLEY", sku: "110192" },
+  { customer: "DIKICHI BANDUNG FRESH", item: "LUMPIA UDANG FROZEN", sku: "110199" },
+  { customer: "DIKICHI BANDUNG FRESH", item: "SIOMAY AYAM FROZEN", sku: "110197" },
+  { customer: "DIKICHI BANDUNG FRESH", item: "SIOMAY NUCLEAR FROZEN", sku: "110198" },
+  { customer: "DIKICHI BANDUNG FRESH", item: "SUNDAE SOFT MIX VANILLA 10L", sku: "110161" },
+  { customer: "DIKICHI BANDUNG FRESH", item: "UDANG KEJU FROZEN", sku: "110196" },
+  { customer: "DIKICHI BANDUNG FRESH", item: "AYAM BIC CUT BAGIAN BESAR REG (DADA/PATAS)", sku: "120043" },
+  { customer: "DIKICHI BANDUNG FRESH", item: "AYAM BIC CUT BAGIAN KECIL REG (PABA/SAYAP)", sku: "120044" },
+  { customer: "DIKICHI BANDUNG FRESH", item: "AYAM BIC CUT BAGIAN BESAR HOT (DADA/PATAS)", sku: "120045" },
+  { customer: "DIKICHI BANDUNG FRESH", item: "AYAM BIC CUT BAGIAN KECIL HOT (PABA/SAYAP)", sku: "120046" },
+
+  // GACOAN
   { customer: "GACOAN BANDUNG FRESH", item: "AYAM CINCANG (V20)", sku: "100211" },
   { customer: "GACOAN BANDUNG FRESH", item: "ADONAN PANGSIT (V20)", sku: "100209" },
+  { customer: "GACOAN BANDUNG FRESH", item: "LUMPIA UDANG (V20)", sku: "100244" },
+  { customer: "GACOAN BANDUNG FRESH", item: "SIOMAY DIMSUM (V20)", sku: "100256" },
+  { customer: "GACOAN BANDUNG FRESH", item: "KULIT PANGSIT (V.20)", sku: "100239" },
+  { customer: "GACOAN BANDUNG FRESH", item: "MIE (V.20)", sku: "100245" },
+  { customer: "GACOAN BANDUNG FRESH", item: "KRUPUK MIE (V.30)", sku: "100238" },
+  { customer: "GACOAN BANDUNG FRESH", item: "SURAI NAGA (V.30)", sku: "100274" },
+  { customer: "GACOAN BANDUNG FRESH", item: "UDANG KEJU FROZEN", sku: "100294" },
+  { customer: "GACOAN BANDUNG FRESH", item: "UDANG RAMBUTAN (PENTOL) (V20)", sku: "100286" },
+
+  // BENFARM
   { customer: "BENFARM BANDUNG FRESH", item: "BENFARM CHICKEN KARAAGE 400 GR", sku: "BEN-00000049" },
-  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM FRANKFURTER SOSIS ORI 300GR", sku: "BEN-00000077" }
+  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM FRANKFURTER SOSIS ORI 300GR", sku: "BEN-00000077" },
+  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM FRANKFURTER SOSIS KEJU 300GR", sku: "BEN-00000078" },
+  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM SPICY CHICKEN POPCORN 400GR", sku: "BEN-00000115" },
+  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM CHICKEN NUGGET PREMIUM 400 GR", sku: "BEN-00000111" },
+  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM HONEY CHICKEN WINGS 400 GR", sku: "BEN-00000112" },
+  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM CHICKEN NUGGET STICK PREMIUM 300GR", sku: "BEN-00000117" },
+  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM SPICY CHICKEN WINGS 400 GR", sku: "BEN-00000120" },
+  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM MAC & CHEESE BITES 180GR", sku: "BEN-00000103" },
+  { customer: "BENFARM BANDUNG FRESH", item: "DEBEZ MAKARONI KEJU GORENG 450GR", sku: "BEN-00000114" },
+  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM MAC & CHEESE BOLOGNESE 180GR", sku: "BEN-00000121" },
+  { customer: "BENFARM BANDUNG FRESH", item: "DEBEZ MAKARONI PEDAS GORENG 300GR", sku: "BEN-00000126" }
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('form'); // 'form' atau 'history'
+  const [activeTab, setActiveTab] = useState('form'); 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,7 +70,6 @@ export default function App() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState('');
 
-  // Referensi untuk input file tersembunyi
   const mainPhotoInputRef = useRef(null);
   const defectPhotoInputRef = useRef(null);
 
@@ -48,7 +79,11 @@ export default function App() {
   const handleItemChange = (itemName) => {
     setSelectedItem(itemName);
     const foundItem = ITEMS.find(i => i.item === itemName);
-    if (foundItem) setSku(foundItem.sku);
+    if (foundItem) {
+      setSku(foundItem.sku);
+    } else {
+      setSku(''); // Kosongkan SKU jika diketik manual tapi salah
+    }
   };
 
   const handlePhotoCapture = (e, type) => {
@@ -73,22 +108,12 @@ export default function App() {
     setIsLoading(true);
 
     const payload = {
-      date,
-      nopol,
-      customer: selectedCustomer,
-      item: selectedItem,
-      sku,
-      qty,
-      expDate,
-      keterangan, 
-      mainPhoto,
-      defectPhoto
+      date, nopol, customer: selectedCustomer, item: selectedItem,
+      sku, qty, expDate, keterangan, mainPhoto, defectPhoto
     };
 
     try {
-      // GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
       const scriptUrl = 'https://script.google.com/macros/s/AKfycbxeoOK8BxfrT2Guk3GGh70v15IITYZYQCOA4K_ek3c8n3BkQ080z4Buqyp0DT9prNi6Mw/exec';
-      
       const response = await fetch(scriptUrl, {
         method: 'POST',
         body: JSON.stringify(payload),
@@ -107,7 +132,6 @@ export default function App() {
       }
     } catch (error) {
       alert('Gagal terhubung ke server. Pastikan internet lancar.');
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -163,7 +187,6 @@ export default function App() {
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 mb-1 tracking-wider">TANGGAL</label>
-                  {/* Perbaikan text-[16px] dan text-gray-800 untuk menghindari zoom dan warna putih di iOS */}
                   <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[50px] appearance-none"/>
                 </div>
                 <div>
@@ -171,12 +194,20 @@ export default function App() {
                   <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 uppercase block min-h-[50px]"/>
                 </div>
               </div>
+              
+              {/* DROPDOWN CUSTOMER BISA DIKETIK */}
               <div>
                 <label className="block text-[10px] font-bold text-gray-400 mb-1 tracking-wider">CUSTOMER ORIGIN</label>
-                <select value={selectedCustomer} onChange={(e) => { setSelectedCustomer(e.target.value); setSelectedItem(''); setSku(''); }} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 appearance-none min-h-[50px]">
-                  <option value="">Pilih Customer...</option>
-                  {CUSTOMERS.map((c, i) => <option key={i} value={c}>{c}</option>)}
-                </select>
+                <input 
+                  list="customer-list"
+                  value={selectedCustomer} 
+                  onChange={(e) => { setSelectedCustomer(e.target.value); setSelectedItem(''); setSku(''); }} 
+                  placeholder="Ketik / Pilih Customer..."
+                  className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[50px]"
+                />
+                <datalist id="customer-list">
+                  {CUSTOMERS.map((c, i) => <option key={i} value={c} />)}
+                </datalist>
               </div>
             </div>
           ) : (
@@ -208,12 +239,21 @@ export default function App() {
                 </div>
 
                 <div className="space-y-4 relative z-10">
+                  
+                  {/* DROPDOWN ITEM BISA DIKETIK */}
                   <div>
                     <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider">NAMA ITEM</label>
-                    <select value={selectedItem} onChange={(e) => handleItemChange(e.target.value)} disabled={!selectedCustomer} className="w-full bg-white border border-red-100 rounded-xl px-4 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 appearance-none min-h-[50px] disabled:bg-gray-50 disabled:text-gray-400">
-                      <option value="">{selectedCustomer ? "Pilih Item..." : "Pilih Customer Dulu"}</option>
-                      {filteredItems.map((i, idx) => <option key={idx} value={i.item}>{i.item}</option>)}
-                    </select>
+                    <input 
+                      list="item-list"
+                      value={selectedItem} 
+                      onChange={(e) => handleItemChange(e.target.value)} 
+                      disabled={!selectedCustomer} 
+                      placeholder={selectedCustomer ? "Ketik / Pilih Item..." : "Pilih Customer Dulu"}
+                      className="w-full bg-white border border-red-100 rounded-xl px-4 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[50px] disabled:bg-gray-50 disabled:text-gray-400"
+                    />
+                    <datalist id="item-list">
+                      {filteredItems.map((i, idx) => <option key={idx} value={i.item} />)}
+                    </datalist>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -229,7 +269,6 @@ export default function App() {
 
                   <div>
                     <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider">EXPIRED DATE</label>
-                    {/* Perbaikan text-[16px] dan text-gray-800 */}
                     <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[50px] appearance-none"/>
                   </div>
                 </div>
