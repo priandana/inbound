@@ -89,9 +89,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
 
 export default function App() {
   
-  // ==========================================
-  // KODE NUKLIR ANTI-ZOOM iOS SAFARI
-  // ==========================================
+  // ANTI-ZOOM iOS SAFARI
   useEffect(() => {
     let meta = document.querySelector("meta[name='viewport']");
     if (!meta) {
@@ -128,8 +126,6 @@ export default function App() {
   const [historyData, setHistoryData] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState('');
-  
-  // FITUR BARU: State untuk pencarian riwayat
   const [searchHistory, setSearchHistory] = useState('');
 
   const [previewImage, setPreviewImage] = useState(null); 
@@ -164,7 +160,16 @@ export default function App() {
     if (foundItem) setSku(foundItem.sku); else setSku('');
   };
 
-  // FITUR BARU: KOMPRESI FOTO OTOMATIS (CANVAS API)
+  // FITUR BARU: CEK NOPOL SEBELUM BUKA KAMERA
+  const triggerCamera = (inputRef) => {
+    if (!nopol || nopol.trim() === '') {
+      showToast('Mohon isi NOPOL terlebih dahulu untuk Watermark!', 'error');
+      return;
+    }
+    inputRef.current.click();
+  };
+
+  // FITUR BARU: WATERMARK PERMANEN (DIBURN-IN KE GAMBAR)
   const handlePhotoCapture = (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -174,7 +179,7 @@ export default function App() {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 1024; // Kompres ukuran max lebar 1024px
+        const MAX_WIDTH = 1024;
         let width = img.width;
         let height = img.height;
 
@@ -186,9 +191,39 @@ export default function App() {
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
+        
+        // Menggambar foto asli
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Kompresi kualitas gambar (0.6 = 60% kualitas)
+        // ===============================================
+        // MENGGAMBAR WATERMARK LANGSUNG KE DALAM GAMBAR
+        // ===============================================
+        const barHeight = 100; // Tinggi kotak hitam di bawah
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; // Hitam transparan
+        ctx.fillRect(0, height - barHeight, width, barHeight);
+
+        // Teks: Judul (FOTO MOBIL / FOTO BAD STOCK)
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#ff4d4d'; // Merah khas B-Log
+        ctx.font = 'bold 22px Arial';
+        const title = type === 'main' ? 'FOTO MOBIL KOSONG' : 'FOTO BAD STOCK';
+        ctx.fillText(`B-LOG INBOUND - ${title}`, 20, height - 60);
+
+        // Teks: Nopol
+        ctx.fillStyle = '#ffffff'; // Putih
+        ctx.font = 'bold 34px Arial';
+        ctx.fillText(nopol.toUpperCase(), 20, height - 20);
+
+        // Teks: Timestamp
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#dddddd'; // Abu-abu muda
+        ctx.font = 'bold 20px monospace';
+        const dateObj = new Date();
+        const timestampStr = `${dateObj.toLocaleDateString('id-ID')} ${dateObj.toLocaleTimeString('id-ID')}`;
+        ctx.fillText(timestampStr, width - 20, height - 25);
+        // ===============================================
+
+        // Convert ke base64 dengan kompresi 60%
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
 
         if (type === 'main') setMainPhoto(compressedBase64);
@@ -288,7 +323,6 @@ export default function App() {
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  // Implementasi Filter Pencarian Riwayat
   const filteredHistoryData = historyData.filter(group => {
     const term = searchHistory.toLowerCase();
     return group.nopol.toLowerCase().includes(term) || group.customer.toLowerCase().includes(term);
@@ -431,7 +465,7 @@ export default function App() {
                     <button type="button" onClick={() => setMainPhoto(null)} className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg opacity-90"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                   </div>
                 ) : (
-                  <button type="button" onClick={() => mainPhotoInputRef.current.click()} className="w-full h-24 border-2 border-dashed border-red-200 rounded-xl flex flex-col items-center justify-center text-red-400 hover:bg-red-50/50 transition"><svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg><span className="text-xs font-bold">Ketuk untuk Foto</span></button>
+                  <button type="button" onClick={() => triggerCamera(mainPhotoInputRef)} className="w-full h-24 border-2 border-dashed border-red-200 rounded-xl flex flex-col items-center justify-center text-red-400 hover:bg-red-50/50 transition"><svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg><span className="text-xs font-bold">Ketuk untuk Foto</span></button>
                 )}
               </div>
 
@@ -447,7 +481,7 @@ export default function App() {
                     <button type="button" onClick={() => setDefectPhoto(null)} className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg opacity-90"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                   </div>
                 ) : (
-                  <button type="button" onClick={() => defectPhotoInputRef.current.click()} className="w-full py-3 border border-dashed border-gray-300 rounded-xl flex items-center justify-center gap-2 text-gray-500 hover:bg-gray-50 transition text-xs font-medium"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg> Tambah Foto Cacat</button>
+                  <button type="button" onClick={() => triggerCamera(defectPhotoInputRef)} className="w-full py-3 border border-dashed border-gray-300 rounded-xl flex items-center justify-center gap-2 text-gray-500 hover:bg-gray-50 transition text-xs font-medium"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg> Tambah Foto Cacat</button>
                 )}
               </div>
 
@@ -477,7 +511,6 @@ export default function App() {
                 <button onClick={fetchHistory} className="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1 active:scale-95 transition-transform"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Refresh</button>
               </div>
 
-              {/* FITUR BARU: SEARCH BAR HISTORY */}
               <div className="relative mb-4">
                 <input 
                   type="text" 
@@ -527,12 +560,13 @@ export default function App() {
                       </div>
                     )}
 
+                    {/* FOTO PREVIEW TANPA OVERLAY KARENA SUDAH DIBURN-IN */}
                     <div className="mt-3 pt-3 border-t border-gray-50 flex gap-2">
                       {group.mainPhotoUrl && (
-                        <button type="button" onClick={() => setPreviewImage({ url: getDriveDirectUrl(group.mainPhotoUrl), title: 'Foto Mobil', nopol: group.nopol, timestamp: group.timestamp })} className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-bold py-1.5 rounded-lg text-center transition">Lihat Mobil</button>
+                        <button type="button" onClick={() => setPreviewImage({ url: getDriveDirectUrl(group.mainPhotoUrl) })} className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-bold py-1.5 rounded-lg text-center transition">Lihat Mobil</button>
                       )}
                       {group.defectPhotoUrl && (
-                        <button type="button" onClick={() => setPreviewImage({ url: getDriveDirectUrl(group.defectPhotoUrl), title: 'Foto Bad Stock', nopol: group.nopol, timestamp: group.timestamp })} className="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-600 text-[10px] font-bold py-1.5 rounded-lg text-center transition">Bad Stock</button>
+                        <button type="button" onClick={() => setPreviewImage({ url: getDriveDirectUrl(group.defectPhotoUrl) })} className="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-600 text-[10px] font-bold py-1.5 rounded-lg text-center transition">Bad Stock</button>
                       )}
                     </div>
                   </div>
@@ -567,16 +601,12 @@ export default function App() {
           </div>
         )}
 
+        {/* MODAL PREVIEW FOTO POLOS (WATERMARK SUDAH ADA DI DALAM GAMBARNYA) */}
         {previewImage && (
           <div className="absolute inset-0 z-[60] bg-gray-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
             <button onClick={() => setPreviewImage(null)} className="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition z-10"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             <div className="w-full max-w-sm bg-black rounded-2xl overflow-hidden shadow-2xl relative border border-gray-800">
                <img src={previewImage.url} alt="Preview" className="w-full h-auto max-h-[70vh] object-contain" />
-               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 pt-10 text-left">
-                  <p className="text-[10px] font-bold text-red-400 mb-0.5 uppercase tracking-wider">{previewImage.title}</p>
-                  <h3 className="text-white font-black text-lg leading-tight uppercase">{previewImage.nopol}</h3>
-                  <p className="text-gray-300 text-[11px] mt-1 flex items-center gap-1 font-mono"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>{previewImage.timestamp}</p>
-               </div>
             </div>
           </div>
         )}
