@@ -51,7 +51,7 @@ const getDriveDirectUrl = (driveUrl) => {
   return driveUrl; 
 };
 
-// --- KOMPONEN DROPDOWN CUSTOM KEREN ---
+// --- KOMPONEN DROPDOWN CUSTOM ---
 const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState(value);
@@ -118,6 +118,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('form'); 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Custom Toast State
+  const [toast, setToast] = useState(null); // { msg, type }
 
   const [date, setDate] = useState('');
   const [nopol, setNopol] = useState('');
@@ -133,13 +136,21 @@ export default function App() {
   const [historyData, setHistoryData] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState('');
-  const [previewImage, setPreviewImage] = useState(null); 
+  
+  // Preview Modal dengan Data Lengkap
+  const [preview, setPreview] = useState(null); // { url, nopol, timestamp, title }
 
   const mainPhotoInputRef = useRef(null);
   const defectPhotoInputRef = useRef(null);
 
   const filteredItems = ITEMS.filter(i => i.customer === selectedCustomer);
   const itemOptions = filteredItems.map(i => i.item);
+
+  // Fungsi memanggil Toast
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3500); // Hilang setelah 3.5 detik
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -164,11 +175,8 @@ export default function App() {
   const handleItemSelect = (itemName) => {
     setSelectedItem(itemName);
     const foundItem = ITEMS.find(i => i.item === itemName);
-    if (foundItem) {
-      setSku(foundItem.sku);
-    } else {
-      setSku('');
-    }
+    if (foundItem) setSku(foundItem.sku);
+    else setSku('');
   };
 
   const handlePhotoCapture = (e, type) => {
@@ -186,7 +194,7 @@ export default function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!date || !nopol || !selectedCustomer || !selectedItem || !qty || !mainPhoto) {
-      alert('Mohon lengkapi semua data wajib dan Foto Mobil Kosong!');
+      showToast('Lengkapi semua data wajib dan Foto Mobil Kosong!', 'error');
       return;
     }
 
@@ -199,14 +207,14 @@ export default function App() {
       const result = await response.json();
 
       if (result.status === 'success') {
-        alert('Sukses! Data dan foto berhasil disimpan ke Gudang Utama.');
+        showToast('Sukses! Data berhasil disimpan ke Gudang Utama.', 'success');
         setDate(''); setNopol(''); setSelectedCustomer(''); setSelectedItem('');
         setSku(''); setQty(''); setExpDate(''); setKeterangan(''); setMainPhoto(null); setDefectPhoto(null);
       } else {
-        alert('Gagal menyimpan: ' + result.message);
+        showToast('Gagal menyimpan: ' + result.message, 'error');
       }
     } catch (error) {
-      alert('Gagal terhubung ke server. Pastikan internet lancar.');
+      showToast('Gagal terhubung ke server. Pastikan internet lancar.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -232,11 +240,17 @@ export default function App() {
     if (activeTab === 'history' && isAuthenticated) fetchHistory();
   }, [activeTab, isAuthenticated]);
 
+  // Fungsi Share ke WhatsApp
+  const handleShareWA = (item) => {
+    const text = `*INBOUND REPORT - B-LOG*\n\n*Waktu:* ${item.timestamp}\n*Nopol:* ${item.nopol}\n*Customer:* ${item.customer}\n*Item:* ${item.item}\n*SKU:* ${item.sku}\n*Qty:* ${item.qty} CTN\n*Keterangan:* ${item.keterangan || '-'}\n\n*Foto Mobil:* ${item.mainPhotoUrl ? getDriveDirectUrl(item.mainPhotoUrl) : '-'}\n*Foto Bad Stock:* ${item.defectPhotoUrl ? getDriveDirectUrl(item.defectPhotoUrl) : '-'}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
   // ===================== RENDER HALAMAN LOGIN =====================
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-200 flex justify-center items-center font-sans text-gray-800 md:p-4">
-        {/* Frame Fixed E-Money Style */}
         <div className="w-full max-w-md bg-white md:rounded-[40px] shadow-2xl p-8 text-center relative overflow-hidden h-screen md:h-[800px] flex flex-col justify-center">
           <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-red-600 to-red-700 rounded-b-[40px]"></div>
           
@@ -275,10 +289,27 @@ export default function App() {
 
   // ===================== RENDER HALAMAN UTAMA =====================
   return (
-    <div className="min-h-screen bg-gray-200 flex justify-center items-center font-sans text-gray-800 md:p-4">
-      {/* Frame Fixed E-Money Style */}
+    <div className="min-h-screen bg-gray-200 flex justify-center items-center font-sans text-gray-800 md:p-4 relative">
       <div className="w-full max-w-md bg-gray-50 md:rounded-[40px] shadow-2xl overflow-hidden relative h-screen md:h-[800px] flex flex-col">
         
+        {/* CUSTOM TOAST NOTIFICATION */}
+        {toast && (
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm z-[100] animate-fade-in">
+            <div className={`p-4 rounded-2xl shadow-2xl flex items-center gap-3 text-white ${toast.type === 'success' ? 'bg-gray-900 border border-gray-700' : 'bg-red-600'}`}>
+              {toast.type === 'success' ? (
+                <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </div>
+              )}
+              <p className="text-sm font-bold leading-tight">{toast.msg}</p>
+            </div>
+          </div>
+        )}
+
         {/* HEADER SIMPLE */}
         <div className="bg-gradient-to-b from-red-600 to-red-700 px-6 pt-10 pb-6 rounded-b-[30px] shadow-sm relative z-20 flex-shrink-0">
           <div className="flex justify-between items-center">
@@ -295,12 +326,11 @@ export default function App() {
           </div>
         </div>
 
-        {/* AREA KONTEN BAWAH (Inilah yang ter-scroll) */}
+        {/* AREA KONTEN BAWAH */}
         <div className="flex-1 overflow-y-auto px-5 pt-6 pb-24 custom-scrollbar relative z-10">
           {activeTab === 'form' ? (
             <form onSubmit={handleSubmit} className="space-y-4">
               
-              {/* BOX INFO UTAMA (TIDAK DI FREEZE LAGI) */}
               <div className="bg-white rounded-[24px] p-5 shadow-sm border border-red-50 relative z-30">
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
@@ -324,7 +354,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* BOX DETAIL BARANG */}
               <div className="bg-white rounded-[24px] p-5 shadow-sm border border-red-50 relative z-20 overflow-visible">
                 <div className="flex items-center gap-2 mb-4 relative z-10">
                   <div className="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center text-red-600">
@@ -363,7 +392,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Box Foto Mobil */}
               <div className="bg-white rounded-[24px] p-5 shadow-sm border border-red-50 relative z-10">
                 <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
                   <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -386,7 +414,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* Box Foto Cacat */}
               <div className="bg-white rounded-[24px] p-5 shadow-sm border border-red-50 relative z-10">
                 <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
                   <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -409,7 +436,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* Box Keterangan */}
               <div className="bg-white rounded-[24px] p-5 shadow-sm border border-red-50 relative z-10 mb-4">
                 <div className="flex items-center gap-2 mb-3">
                   <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
@@ -433,7 +459,6 @@ export default function App() {
             </form>
           ) : (
             <div className="space-y-4">
-              {/* HEADER HISTORY MUNCUL DI DALAM SCROLL */}
               <div className="flex justify-between items-end mb-2 px-1">
                 <div>
                   <h2 className="text-xl font-bold text-gray-800">Log Terkini</h2>
@@ -461,12 +486,19 @@ export default function App() {
                 historyData.map((data, index) => (
                   <div key={index} className="bg-white p-4 rounded-2xl shadow-sm border border-red-50 relative overflow-hidden group">
                     <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
+                    
+                    {/* TOMBOL SHARE WHATSAPP */}
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <span className="text-[10px] font-bold text-gray-400 block">{data.date}</span>
                         <h4 className="font-black text-gray-800 text-sm mt-0.5">{data.nopol}</h4>
                       </div>
-                      <span className="bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-[10px] font-bold border border-red-100">{data.qty} CTN</span>
+                      <div className="flex gap-2 items-center">
+                        <button onClick={() => handleShareWA(data)} className="bg-green-50 text-green-600 p-1.5 rounded-lg hover:bg-green-100 transition shadow-sm border border-green-100" title="Share ke WA">
+                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </button>
+                        <span className="bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-[10px] font-bold border border-red-100">{data.qty} CTN</span>
+                      </div>
                     </div>
                     <p className="text-xs font-bold text-gray-600 leading-tight">{data.item}</p>
                     <p className="text-[10px] text-gray-400 mt-1">{data.customer}</p>
@@ -480,10 +512,10 @@ export default function App() {
 
                     <div className="mt-3 pt-3 border-t border-gray-50 flex gap-2">
                       {data.mainPhotoUrl && (
-                        <button type="button" onClick={() => setPreviewImage(getDriveDirectUrl(data.mainPhotoUrl))} className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-bold py-1.5 rounded-lg text-center transition">Lihat Mobil</button>
+                        <button type="button" onClick={() => setPreviewImage({ url: getDriveDirectUrl(data.mainPhotoUrl), title: 'Foto Mobil', nopol: data.nopol, timestamp: data.timestamp })} className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-bold py-1.5 rounded-lg text-center transition">Lihat Mobil</button>
                       )}
                       {data.defectPhotoUrl && (
-                        <button type="button" onClick={() => setPreviewImage(getDriveDirectUrl(data.defectPhotoUrl))} className="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-600 text-[10px] font-bold py-1.5 rounded-lg text-center transition">Bad Stock</button>
+                        <button type="button" onClick={() => setPreviewImage({ url: getDriveDirectUrl(data.defectPhotoUrl), title: 'Foto Bad Stock', nopol: data.nopol, timestamp: data.timestamp })} className="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-600 text-[10px] font-bold py-1.5 rounded-lg text-center transition">Bad Stock</button>
                       )}
                     </div>
                   </div>
@@ -525,16 +557,25 @@ export default function App() {
           </div>
         )}
 
-        {/* MODAL PREVIEW FOTO */}
+        {/* MODAL PREVIEW FOTO DENGAN TIMESTAMP OVERLAY */}
         {previewImage && (
-          <div className="absolute inset-0 z-[60] bg-gray-900/90 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
-            <button onClick={() => setPreviewImage(null)} className="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition">
+          <div className="absolute inset-0 z-[60] bg-gray-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
+            <button onClick={() => setPreviewImage(null)} className="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition z-10">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <div className="w-full max-w-sm bg-transparent rounded-2xl overflow-hidden shadow-2xl relative">
-               <img src={previewImage} alt="Preview Mobil/Barang" className="w-full h-auto max-h-[70vh] object-contain rounded-2xl" />
+            <div className="w-full max-w-sm bg-black rounded-2xl overflow-hidden shadow-2xl relative border border-gray-800">
+               <img src={previewImage.url} alt="Preview Mobil/Barang" className="w-full h-auto max-h-[70vh] object-contain" />
+               
+               {/* OVERLAY TIMESTAMP CCTV STYLE */}
+               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 pt-10 text-left">
+                  <p className="text-[10px] font-bold text-red-400 mb-0.5 uppercase tracking-wider">{previewImage.title}</p>
+                  <h3 className="text-white font-black text-lg leading-tight uppercase">{previewImage.nopol}</h3>
+                  <p className="text-gray-300 text-[11px] mt-1 flex items-center gap-1 font-mono">
+                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                     {previewImage.timestamp}
+                  </p>
+               </div>
             </div>
-            <p className="text-white/70 text-sm mt-4 font-medium">Ketuk X untuk menutup</p>
           </div>
         )}
 
