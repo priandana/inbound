@@ -41,6 +41,15 @@ const ITEMS = [
   { customer: "BENFARM BANDUNG FRESH", item: "DEBEZ MAKARONI PEDAS GORENG 300GR", sku: "BEN-00000126" }
 ];
 
+// FUNGSI MENDAPATKAN TANGGAL HARI INI OTOMATIS (FORMAT: YYYY-MM-DD)
+const getTodayDate = () => {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 const getDriveDirectUrl = (driveUrl) => {
   if (!driveUrl) return '';
   const match = driveUrl.match(/\/d\/(.+?)\//);
@@ -109,7 +118,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState(null); 
 
-  const [date, setDate] = useState('');
+  // KINI TANGGAL OTOMATIS TERISI HARI INI
+  const [date, setDate] = useState(getTodayDate());
   const [nopol, setNopol] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState('');
   const [keterangan, setKeterangan] = useState(''); 
@@ -149,7 +159,7 @@ export default function App() {
 
   const handleLogout = () => {
     setIsAuthenticated(false); setShowLogoutConfirm(false);
-    setDate(''); setNopol(''); setSelectedCustomer(''); 
+    setDate(getTodayDate()); setNopol(''); setSelectedCustomer(''); 
     setSelectedItem(''); setSku(''); setQty(''); setExpDate(''); setKeterangan('');
     setMainPhoto(null); setDefectPhoto(null); setCart([]); setSearchHistory('');
   };
@@ -160,7 +170,7 @@ export default function App() {
     if (foundItem) setSku(foundItem.sku); else setSku('');
   };
 
-  // FITUR BARU: CEK NOPOL SEBELUM BUKA KAMERA
+  // FITUR: CEK NOPOL SEBELUM BUKA KAMERA
   const triggerCamera = (inputRef) => {
     if (!nopol || nopol.trim() === '') {
       showToast('Mohon isi NOPOL terlebih dahulu untuk Watermark!', 'error');
@@ -169,7 +179,7 @@ export default function App() {
     inputRef.current.click();
   };
 
-  // FITUR BARU: WATERMARK PERMANEN (DIBURN-IN KE GAMBAR)
+  // FITUR: WATERMARK PERMANEN (DIBURN-IN KE GAMBAR)
   const handlePhotoCapture = (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -192,38 +202,29 @@ export default function App() {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         
-        // Menggambar foto asli
         ctx.drawImage(img, 0, 0, width, height);
 
-        // ===============================================
-        // MENGGAMBAR WATERMARK LANGSUNG KE DALAM GAMBAR
-        // ===============================================
-        const barHeight = 100; // Tinggi kotak hitam di bawah
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; // Hitam transparan
+        const barHeight = 100;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; 
         ctx.fillRect(0, height - barHeight, width, barHeight);
 
-        // Teks: Judul (FOTO MOBIL / FOTO BAD STOCK)
         ctx.textAlign = 'left';
-        ctx.fillStyle = '#ff4d4d'; // Merah khas B-Log
+        ctx.fillStyle = '#ff4d4d'; 
         ctx.font = 'bold 22px Arial';
         const title = type === 'main' ? 'FOTO MOBIL' : 'FOTO BAD STOCK';
         ctx.fillText(`B-LOG INBOUND - ${title}`, 20, height - 60);
 
-        // Teks: Nopol
-        ctx.fillStyle = '#ffffff'; // Putih
+        ctx.fillStyle = '#ffffff'; 
         ctx.font = 'bold 34px Arial';
         ctx.fillText(nopol.toUpperCase(), 20, height - 20);
 
-        // Teks: Timestamp
         ctx.textAlign = 'right';
-        ctx.fillStyle = '#dddddd'; // Abu-abu muda
+        ctx.fillStyle = '#dddddd'; 
         ctx.font = 'bold 20px monospace';
         const dateObj = new Date();
         const timestampStr = `${dateObj.toLocaleDateString('id-ID')} ${dateObj.toLocaleTimeString('id-ID')}`;
         ctx.fillText(timestampStr, width - 20, height - 25);
-        // ===============================================
 
-        // Convert ke base64 dengan kompresi 60%
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
 
         if (type === 'main') setMainPhoto(compressedBase64);
@@ -267,7 +268,8 @@ export default function App() {
 
       if (result.status === 'success') {
         showToast('Sukses! Data seluruh barang berhasil disimpan.', 'success');
-        setDate(''); setNopol(''); setSelectedCustomer(''); setKeterangan(''); setMainPhoto(null); setDefectPhoto(null); setCart([]);
+        // RESET DATE KEMBALI KE TANGGAL HARI INI
+        setDate(getTodayDate()); setNopol(''); setSelectedCustomer(''); setKeterangan(''); setMainPhoto(null); setDefectPhoto(null); setCart([]);
       } else {
         showToast('Gagal menyimpan: ' + result.message, 'error');
       }
@@ -456,7 +458,7 @@ export default function App() {
               <div className="bg-white rounded-[24px] p-5 shadow-sm border border-red-50 relative z-10">
                 <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
                   <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                  Foto Mobil <span className="text-red-500">*</span>
+                  Foto Mobil Kosong <span className="text-red-500">*</span>
                 </h3>
                 <input type="file" accept="image/*" capture="environment" ref={mainPhotoInputRef} onChange={(e) => handlePhotoCapture(e, 'main')} className="hidden" />
                 {mainPhoto ? (
@@ -560,7 +562,6 @@ export default function App() {
                       </div>
                     )}
 
-                    {/* FOTO PREVIEW TANPA OVERLAY KARENA SUDAH DIBURN-IN */}
                     <div className="mt-3 pt-3 border-t border-gray-50 flex gap-2">
                       {group.mainPhotoUrl && (
                         <button type="button" onClick={() => setPreviewImage({ url: getDriveDirectUrl(group.mainPhotoUrl) })} className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-bold py-1.5 rounded-lg text-center transition">Lihat Mobil</button>
@@ -601,7 +602,6 @@ export default function App() {
           </div>
         )}
 
-        {/* MODAL PREVIEW FOTO POLOS (WATERMARK SUDAH ADA DI DALAM GAMBARNYA) */}
         {previewImage && (
           <div className="absolute inset-0 z-[60] bg-gray-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
             <button onClick={() => setPreviewImage(null)} className="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition z-10"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
