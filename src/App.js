@@ -111,7 +111,6 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
 };
 
 export default function App() {
-  // --- STATE OTENTIKASI & APLIKASI ---
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState(false);
@@ -120,7 +119,6 @@ export default function App() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- STATE FORM & FOTO ---
   const [date, setDate] = useState('');
   const [nopol, setNopol] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState('');
@@ -132,11 +130,10 @@ export default function App() {
   const [mainPhoto, setMainPhoto] = useState(null);
   const [defectPhoto, setDefectPhoto] = useState(null);
   
-  // --- STATE HISTORY & PREVIEW MODAL ---
   const [historyData, setHistoryData] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState('');
-  const [previewImage, setPreviewImage] = useState(null); // Menyimpan URL gambar yang sedang di-preview
+  const [previewImage, setPreviewImage] = useState(null); 
 
   const mainPhotoInputRef = useRef(null);
   const defectPhotoInputRef = useRef(null);
@@ -238,9 +235,10 @@ export default function App() {
   // ===================== RENDER HALAMAN LOGIN =====================
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center font-sans text-gray-800 p-4">
-        <div className="w-full max-w-sm bg-white rounded-[40px] shadow-2xl p-8 text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-red-600 to-red-700 rounded-b-[40px]"></div>
+      <div className="min-h-screen bg-gray-200 flex justify-center items-center font-sans text-gray-800 md:p-4">
+        {/* Frame Fixed E-Money Style */}
+        <div className="w-full max-w-md bg-white md:rounded-[40px] shadow-2xl p-8 text-center relative overflow-hidden h-screen md:h-[800px] flex flex-col justify-center">
+          <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-red-600 to-red-700 rounded-b-[40px]"></div>
           
           <div className="relative z-10 mt-6 mb-8">
             <div className="w-20 h-20 bg-white rounded-full mx-auto shadow-lg flex items-center justify-center border-4 border-red-50 mb-4">
@@ -277,11 +275,12 @@ export default function App() {
 
   // ===================== RENDER HALAMAN UTAMA =====================
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center items-start md:py-10 font-sans text-gray-800">
-      <div className="w-full max-w-md bg-gray-50 md:rounded-[40px] md:shadow-2xl overflow-hidden relative min-h-screen md:min-h-[850px] flex flex-col">
+    <div className="min-h-screen bg-gray-200 flex justify-center items-center font-sans text-gray-800 md:p-4">
+      {/* Frame Fixed E-Money Style - Mengunci tinggi agar terlihat spt HP */}
+      <div className="w-full max-w-md bg-gray-50 md:rounded-[40px] shadow-2xl overflow-hidden relative h-screen md:h-[800px] flex flex-col">
         
         {/* HEADER */}
-        <div className="bg-gradient-to-b from-red-600 to-red-700 px-6 pt-12 pb-16 rounded-b-[40px] shadow-lg relative z-20">
+        <div className="bg-gradient-to-b from-red-600 to-red-700 px-6 pt-12 pb-16 rounded-b-[40px] shadow-lg relative z-20 flex-shrink-0">
           <div className="flex justify-between items-center mb-6">
             <div>
               <p className="text-red-200 text-xs font-bold tracking-wider mb-1 flex items-center gap-1">
@@ -331,7 +330,7 @@ export default function App() {
           )}
         </div>
 
-        {/* AREA KONTEN BAWAH (SCROLL) */}
+        {/* AREA KONTEN BAWAH (Inilah yang akan ter-scroll) */}
         <div className="flex-1 overflow-y-auto px-6 pb-32 pt-36 bg-gray-50 custom-scrollbar relative z-10">
           {activeTab === 'form' ? (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -479,7 +478,6 @@ export default function App() {
                       </div>
                     )}
 
-                    {/* PERUBAHAN DI SINI: Tombol tidak membuka link baru, melainkan memanggil Modal */}
                     <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
                       {data.mainPhotoUrl && (
                         <button type="button" onClick={() => setPreviewImage(getDriveDirectUrl(data.mainPhotoUrl))} className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold py-2 rounded-xl text-center transition">Lihat Mobil</button>
@@ -495,7 +493,7 @@ export default function App() {
           )}
         </div>
 
-        {/* BOTTOM NAVIGATION */}
+        {/* BOTTOM NAVIGATION FIXED */}
         <div className="absolute bottom-6 left-6 right-6 z-40">
           <div className="bg-white/90 backdrop-blur-xl p-2 rounded-3xl shadow-2xl flex border border-gray-100">
             <button onClick={() => setActiveTab('form')} className={`flex-1 py-3 flex flex-col items-center gap-1 rounded-2xl font-bold text-[11px] transition-all ${activeTab === 'form' ? 'bg-red-50 text-red-600' : 'text-gray-400 hover:text-gray-600'}`}>
@@ -509,7 +507,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Modal Logout */}
+        {/* Modal Logout (Z-Index diatur pas dengan frame HP) */}
         {showLogoutConfirm && (
           <div className="absolute inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
             <div className="bg-white rounded-3xl p-6 shadow-2xl w-full max-w-sm scale-100 transition-transform">
@@ -527,15 +525,12 @@ export default function App() {
           </div>
         )}
 
-        {/* MODAL PREVIEW FOTO (FITUR BARU) */}
+        {/* MODAL PREVIEW FOTO */}
         {previewImage && (
           <div className="absolute inset-0 z-[60] bg-gray-900/90 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
-            {/* Tombol Close */}
             <button onClick={() => setPreviewImage(null)} className="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            
-            {/* Gambar */}
             <div className="w-full max-w-sm bg-transparent rounded-2xl overflow-hidden shadow-2xl relative">
                <img src={previewImage} alt="Preview Mobil/Barang" className="w-full h-auto max-h-[70vh] object-contain rounded-2xl" />
             </div>
