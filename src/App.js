@@ -119,8 +119,7 @@ export default function App() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Custom Toast State
-  const [toast, setToast] = useState(null); // { msg, type }
+  const [toast, setToast] = useState(null); 
 
   const [date, setDate] = useState('');
   const [nopol, setNopol] = useState('');
@@ -137,8 +136,8 @@ export default function App() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState('');
   
-  // Preview Modal dengan Data Lengkap
-  const [preview, setPreview] = useState(null); // { url, nopol, timestamp, title }
+  // FIX: Mengganti nama state agar sesuai dengan yang dipanggil di JSX
+  const [previewImage, setPreviewImage] = useState(null); 
 
   const mainPhotoInputRef = useRef(null);
   const defectPhotoInputRef = useRef(null);
@@ -146,10 +145,9 @@ export default function App() {
   const filteredItems = ITEMS.filter(i => i.customer === selectedCustomer);
   const itemOptions = filteredItems.map(i => i.item);
 
-  // Fungsi memanggil Toast
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });
-    setTimeout(() => setToast(null), 3500); // Hilang setelah 3.5 detik
+    setTimeout(() => setToast(null), 3500); 
   };
 
   const handleLogin = (e) => {
@@ -240,14 +238,12 @@ export default function App() {
     if (activeTab === 'history' && isAuthenticated) fetchHistory();
   }, [activeTab, isAuthenticated]);
 
-  // Fungsi Share ke WhatsApp
   const handleShareWA = (item) => {
     const text = `*INBOUND REPORT - B-LOG*\n\n*Waktu:* ${item.timestamp}\n*Nopol:* ${item.nopol}\n*Customer:* ${item.customer}\n*Item:* ${item.item}\n*SKU:* ${item.sku}\n*Qty:* ${item.qty} CTN\n*Keterangan:* ${item.keterangan || '-'}\n\n*Foto Mobil:* ${item.mainPhotoUrl ? getDriveDirectUrl(item.mainPhotoUrl) : '-'}\n*Foto Bad Stock:* ${item.defectPhotoUrl ? getDriveDirectUrl(item.defectPhotoUrl) : '-'}`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
 
-  // ===================== RENDER HALAMAN LOGIN =====================
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-200 flex justify-center items-center font-sans text-gray-800 md:p-4">
@@ -287,7 +283,6 @@ export default function App() {
     );
   }
 
-  // ===================== RENDER HALAMAN UTAMA =====================
   return (
     <div className="min-h-screen bg-gray-200 flex justify-center items-center font-sans text-gray-800 md:p-4 relative">
       <div className="w-full max-w-md bg-gray-50 md:rounded-[40px] shadow-2xl overflow-hidden relative h-screen md:h-[800px] flex flex-col">
@@ -310,7 +305,6 @@ export default function App() {
           </div>
         )}
 
-        {/* HEADER SIMPLE */}
         <div className="bg-gradient-to-b from-red-600 to-red-700 px-6 pt-10 pb-6 rounded-b-[30px] shadow-sm relative z-20 flex-shrink-0">
           <div className="flex justify-between items-center">
             <div>
@@ -326,7 +320,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* AREA KONTEN BAWAH */}
         <div className="flex-1 overflow-y-auto px-5 pt-6 pb-24 custom-scrollbar relative z-10">
           {activeTab === 'form' ? (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -487,7 +480,6 @@ export default function App() {
                   <div key={index} className="bg-white p-4 rounded-2xl shadow-sm border border-red-50 relative overflow-hidden group">
                     <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
                     
-                    {/* TOMBOL SHARE WHATSAPP */}
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <span className="text-[10px] font-bold text-gray-400 block">{data.date}</span>
@@ -525,7 +517,6 @@ export default function App() {
           )}
         </div>
 
-        {/* BOTTOM NAVIGATION FIXED & SLIM */}
         <div className="absolute bottom-4 left-5 right-5 z-40">
           <div className="bg-white/95 backdrop-blur-xl p-1.5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex border border-gray-100">
             <button onClick={() => setActiveTab('form')} className={`flex-1 py-2 flex flex-col items-center gap-0.5 rounded-xl font-bold text-[10px] transition-all ${activeTab === 'form' ? 'bg-red-50 text-red-600' : 'text-gray-400 hover:text-gray-600'}`}>
@@ -539,7 +530,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Modal Logout */}
         {showLogoutConfirm && (
           <div className="absolute inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
             <div className="bg-white rounded-[30px] p-6 shadow-2xl w-full max-w-[320px] scale-100 transition-transform">
@@ -557,7 +547,6 @@ export default function App() {
           </div>
         )}
 
-        {/* MODAL PREVIEW FOTO DENGAN TIMESTAMP OVERLAY */}
         {previewImage && (
           <div className="absolute inset-0 z-[60] bg-gray-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
             <button onClick={() => setPreviewImage(null)} className="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition z-10">
@@ -566,7 +555,6 @@ export default function App() {
             <div className="w-full max-w-sm bg-black rounded-2xl overflow-hidden shadow-2xl relative border border-gray-800">
                <img src={previewImage.url} alt="Preview Mobil/Barang" className="w-full h-auto max-h-[70vh] object-contain" />
                
-               {/* OVERLAY TIMESTAMP CCTV STYLE */}
                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 pt-10 text-left">
                   <p className="text-[10px] font-bold text-red-400 mb-0.5 uppercase tracking-wider">{previewImage.title}</p>
                   <h3 className="text-white font-black text-lg leading-tight uppercase">{previewImage.nopol}</h3>
