@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './globals.css';
+import './index.css';
 
 // --- DATA SEMENTARA (Sesuai Spreadsheet Anda) ---
 const CUSTOMERS = ["DIKICHI BANDUNG FRESH", "GACOAN BANDUNG FRESH", "BENFARM BANDUNG FRESH"];
