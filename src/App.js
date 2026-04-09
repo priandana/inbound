@@ -71,7 +71,8 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
   return (
     <div className="relative" ref={wrapperRef}>
       <div className="relative">
-        <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setIsOpen(true); }} onFocus={() => setIsOpen(true)} placeholder={placeholder} disabled={disabled} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[50px] disabled:bg-gray-50 disabled:text-gray-400 pr-10 transition-all" />
+        {/* PERUBAHAN: text-[16px] diganti text-base agar 100% aman dari zoom */}
+        <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setIsOpen(true); }} onFocus={() => setIsOpen(true)} placeholder={placeholder} disabled={disabled} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[50px] disabled:bg-gray-50 disabled:text-gray-400 pr-10 transition-all" />
         <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
           <svg className={`w-5 h-5 ${disabled ? 'text-gray-300' : 'text-red-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
         </div>
@@ -88,6 +89,20 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
 };
 
 export default function App() {
+  
+  // ==========================================
+  // KODE NUKLIR ANTI-ZOOM iOS SAFARI
+  // ==========================================
+  useEffect(() => {
+    let meta = document.querySelector("meta[name='viewport']");
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'viewport';
+      document.head.appendChild(meta);
+    }
+    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
+  }, []);
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState(false);
@@ -97,7 +112,6 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState(null); 
 
-  // General Form Info
   const [date, setDate] = useState('');
   const [nopol, setNopol] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState('');
@@ -105,16 +119,13 @@ export default function App() {
   const [mainPhoto, setMainPhoto] = useState(null);
   const [defectPhoto, setDefectPhoto] = useState(null);
   
-  // Temporary Item Form
   const [selectedItem, setSelectedItem] = useState('');
   const [sku, setSku] = useState('');
   const [qty, setQty] = useState('');
   const [expDate, setExpDate] = useState('');
 
-  // CART (KERANJANG ITEM)
   const [cart, setCart] = useState([]); 
   
-  // History State
   const [historyData, setHistoryData] = useState([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState('');
@@ -142,7 +153,7 @@ export default function App() {
     setIsAuthenticated(false); setShowLogoutConfirm(false);
     setDate(''); setNopol(''); setSelectedCustomer(''); 
     setSelectedItem(''); setSku(''); setQty(''); setExpDate(''); setKeterangan('');
-    setMainPhoto(null); setDefectPhoto(null); setCart([]); // Clear Cart
+    setMainPhoto(null); setDefectPhoto(null); setCart([]); 
   };
 
   const handleItemSelect = (itemName) => {
@@ -163,14 +174,13 @@ export default function App() {
     }
   };
 
-  // TAMBAH KE KERANJANG
   const handleAddToCart = () => {
     if (!selectedItem || !qty || !expDate) {
       showToast('Pilih Item, isi QTY, dan Expired Date!', 'error');
       return;
     }
     setCart([...cart, { item: selectedItem, sku, qty, expDate }]);
-    setSelectedItem(''); setSku(''); setQty(''); setExpDate(''); // Reset form kecil
+    setSelectedItem(''); setSku(''); setQty(''); setExpDate(''); 
     showToast('Barang ditambahkan ke truk!', 'success');
   };
 
@@ -188,7 +198,6 @@ export default function App() {
     }
 
     setIsLoading(true);
-    // Kirim Payload dengan format ARRAY ITEMS
     const payload = { date, nopol, customer: selectedCustomer, keterangan, mainPhoto, defectPhoto, items: cart };
 
     try {
@@ -218,7 +227,6 @@ export default function App() {
       const result = await response.json();
       
       if (result.status === 'success') {
-        // KELOMPOKKAN BERDASARKAN TIMESTAMP + NOPOL
         const grouped = [];
         const map = new Map();
 
@@ -228,7 +236,7 @@ export default function App() {
             map.set(key, {
               timestamp: row.timestamp, date: row.date, nopol: row.nopol, customer: row.customer,
               keterangan: row.keterangan, mainPhotoUrl: row.mainPhotoUrl, defectPhotoUrl: row.defectPhotoUrl,
-              items: [] // Siapkan keranjang history
+              items: [] 
             });
             grouped.push(map.get(key));
           }
@@ -250,13 +258,8 @@ export default function App() {
 
   const handleShareWA = (group) => {
     let text = `*INBOUND REPORT - B-LOG*\n\n*Waktu:* ${group.timestamp}\n*Nopol:* ${group.nopol}\n*Customer Origin:* ${group.customer}\n\n*DAFTAR BARANG MASUK:*\n`;
-    
-    group.items.forEach((it, idx) => {
-       text += `${idx + 1}. ${it.item} (SKU: ${it.sku}) - *${it.qty} CTN*\n`;
-    });
-    
+    group.items.forEach((it, idx) => { text += `${idx + 1}. ${it.item} (SKU: ${it.sku}) - *${it.qty} CTN*\n`; });
     text += `\n*Keterangan Reject:* ${group.keterangan || '-'}\n\n*Link Foto Mobil:* ${group.mainPhotoUrl ? getDriveDirectUrl(group.mainPhotoUrl) : '-'}\n*Link Foto Defect:* ${group.defectPhotoUrl ? getDriveDirectUrl(group.defectPhotoUrl) : '-'}`;
-    
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -320,11 +323,11 @@ export default function App() {
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 mb-1 tracking-wider uppercase">Tanggal</label>
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[46px] appearance-none"/>
+                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[46px] appearance-none"/>
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 mb-1 tracking-wider uppercase">Nopol</label>
-                    <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 uppercase block min-h-[46px]"/>
+                    <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-3 py-3 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 uppercase block min-h-[46px]"/>
                   </div>
                 </div>
                 <div>
@@ -351,25 +354,23 @@ export default function App() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider uppercase">SKU</label>
-                      <input type="text" value={sku} readOnly placeholder="Otomatis" className="w-full bg-red-50 border border-transparent rounded-xl px-3 py-3 text-[16px] font-mono text-gray-500 block min-h-[46px]" />
+                      <input type="text" value={sku} readOnly placeholder="Otomatis" className="w-full bg-red-50 border border-transparent rounded-xl px-3 py-3 text-base font-mono text-gray-500 block min-h-[46px]" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider uppercase">QTY (CTN)</label>
-                      <input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="0" className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 font-bold block min-h-[46px]"/>
+                      <input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="0" className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 font-bold block min-h-[46px]"/>
                     </div>
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold text-red-400 mb-1 tracking-wider uppercase">Expired Date</label>
-                    <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[46px] appearance-none"/>
+                    <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[46px] appearance-none"/>
                   </div>
                   
-                  {/* TOMBOL TAMBAH KE KERANJANG */}
                   <button type="button" onClick={handleAddToCart} className="w-full mt-2 bg-white border-2 border-red-600 text-red-600 hover:bg-red-50 font-bold text-sm py-3 rounded-xl active:scale-95 transition-transform flex justify-center items-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg> Tambah ke Truk
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg Tambah ke Truk
                   </button>
                 </div>
 
-                {/* LIST ITEM DI KERANJANG */}
                 {cart.length > 0 && (
                   <div className="mt-4 border-t border-gray-100 pt-4 space-y-2">
                     {cart.map((c, idx) => (
@@ -424,7 +425,7 @@ export default function App() {
                   <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                   <h3 className="font-bold text-gray-800 text-sm">Keterangan (Opsional)</h3>
                 </div>
-                <textarea value={keterangan} onChange={(e) => setKeterangan(e.target.value)} placeholder="Contoh: Kemasan sobek, ayam berbau..." className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-[16px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[70px]"/>
+                <textarea value={keterangan} onChange={(e) => setKeterangan(e.target.value)} placeholder="Contoh: Kemasan sobek, ayam berbau..." className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[70px]"/>
               </div>
 
               <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white font-black text-base py-4 rounded-2xl shadow-lg shadow-red-600/20 active:scale-[0.98] transition-transform disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2 relative z-10 mb-6">
@@ -467,7 +468,6 @@ export default function App() {
                       </button>
                     </div>
 
-                    {/* LIST ITEM HISTORY DI KELOMPOKKAN */}
                     <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 space-y-2 mt-2">
                        {group.items.map((it, i) => (
                          <div key={i} className="flex justify-between items-start border-b border-gray-200 pb-2 last:border-0 last:pb-0">
