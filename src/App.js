@@ -71,7 +71,6 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled }) => {
   return (
     <div className="relative" ref={wrapperRef}>
       <div className="relative">
-        {/* PERUBAHAN: text-[16px] diganti text-base agar 100% aman dari zoom */}
         <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setIsOpen(true); }} onFocus={() => setIsOpen(true)} placeholder={placeholder} disabled={disabled} className="w-full bg-red-50/50 border border-red-100 rounded-xl px-4 py-3 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 min-h-[50px] disabled:bg-gray-50 disabled:text-gray-400 pr-10 transition-all" />
         <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
           <svg className={`w-5 h-5 ${disabled ? 'text-gray-300' : 'text-red-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -366,8 +365,9 @@ export default function App() {
                     <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className="w-full bg-white border border-red-100 rounded-xl px-3 py-3 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 block min-h-[46px] appearance-none"/>
                   </div>
                   
+                  {/* FIX TYPO: DITAMBAH TANDA ">" PADA TAG SVG DI BAWAH INI */}
                   <button type="button" onClick={handleAddToCart} className="w-full mt-2 bg-white border-2 border-red-600 text-red-600 hover:bg-red-50 font-bold text-sm py-3 rounded-xl active:scale-95 transition-transform flex justify-center items-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg Tambah ke Truk
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg> Tambah ke Truk
                   </button>
                 </div>
 
