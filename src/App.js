@@ -456,49 +456,95 @@ export default function App() {
   const inputCls = `w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-4 text-sm font-semibold text-gray-800 outline-none transition-all duration-200 focus:border-current shadow-sm`;
 
   // ══════════════════════════════════════════════
-  // PAGE 1: PORTAL
+  // PAGE 1: PORTAL — Premium Splash
   // ══════════════════════════════════════════════
   if (!role) return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(160deg, #f8fafc 0%, #e2e8f0 100%)' }}>
+    <div className="fixed inset-0 flex flex-col overflow-hidden" style={{ background: 'linear-gradient(160deg, #c0392b 0%, #7f1d1d 55%, #1c0a00 100%)' }}>
       {toast && <Toast {...toast} />}
-      <div className="w-full max-w-sm animate-scale-in">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-xl" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
+
+      {/* ── Decorative blobs ── */}
+      <div className="absolute" style={{ top: '-60px', right: '-60px', width: 280, height: 280, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }}/>
+      <div className="absolute" style={{ top: '60px', right: '40px', width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}/>
+      <div className="absolute" style={{ bottom: '-80px', left: '-60px', width: 260, height: 260, borderRadius: '50%', background: 'rgba(239,68,68,0.15)' }}/>
+      <div className="absolute" style={{ top: '35%', left: '-30px', width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}/>
+
+      {/* ── Hero Section ── */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-4">
+        {/* Glow rings + logo */}
+        <div className="relative mb-8 animate-scale-in">
+          <div className="absolute rounded-3xl animate-pulse" style={{ inset: -20, background: 'rgba(255,255,255,0.06)', borderRadius: 36 }}/>
+          <div className="absolute rounded-3xl" style={{ inset: -10, background: 'rgba(255,255,255,0.09)', borderRadius: 30 }}/>
+          <div className="w-28 h-28 rounded-3xl flex items-center justify-center text-6xl shadow-2xl relative z-10"
+            style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(20px)', border: '1.5px solid rgba(255,255,255,0.25)' }}>
             🚛
           </div>
-          <h1 className="text-3xl font-black text-gray-900">B-Log App</h1>
-          <p className="text-gray-400 text-sm font-medium mt-1">Sistem Operasional Logistik</p>
         </div>
 
-        {/* Cards */}
-        <div className="space-y-3">
-          <button onClick={() => setRole('inbound')}
-            className="press-scale w-full bg-white rounded-3xl p-5 shadow-lg flex items-center gap-4 border border-gray-100 text-left group hover:shadow-xl transition-all duration-250">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-inner flex-shrink-0" style={{ background: '#fef2f2' }}>📦</div>
-            <div className="flex-1">
-              <h3 className="font-black text-gray-900 text-base">Inbound</h3>
-              <p className="text-xs text-gray-400 font-medium mt-0.5">Penerimaan Barang Masuk</p>
-            </div>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#fef2f2' }}>
-              <svg width="14" height="14" fill="none" stroke="#ef4444" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6"/></svg>
-            </div>
-          </button>
+        <h1 className="text-5xl font-black text-white text-center tracking-tight animate-slide-up" style={{ textShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+          B-Log
+        </h1>
+        <p className="text-white/50 text-sm font-semibold text-center mt-2 tracking-wider uppercase animate-slide-up">
+          Sistem Operasional Logistik
+        </p>
 
-          <button onClick={() => setRole('outbound')}
-            className="press-scale w-full bg-white rounded-3xl p-5 shadow-lg flex items-center gap-4 border border-gray-100 text-left hover:shadow-xl transition-all duration-250">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-inner flex-shrink-0" style={{ background: '#eff6ff' }}>🚚</div>
-            <div className="flex-1">
-              <h3 className="font-black text-gray-900 text-base">Outbound</h3>
-              <p className="text-xs text-gray-400 font-medium mt-0.5">Pengiriman Multi-Drop</p>
+        {/* Tagline pills */}
+        <div className="flex gap-2 mt-6 animate-fade-in">
+          {['📦 Inbound', '🚚 Outbound', '📊 Realtime'].map(t => (
+            <div key={t} className="px-3 py-1.5 rounded-full text-xs font-bold text-white/80"
+              style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }}>
+              {t}
             </div>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#eff6ff' }}>
-              <svg width="14" height="14" fill="none" stroke="#3b82f6" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6"/></svg>
-            </div>
-          </button>
+          ))}
         </div>
+      </div>
 
-        <p className="text-center text-xs text-gray-300 mt-8 font-medium">B-Log Operasional © 2025</p>
+      {/* ── Bottom card area ── */}
+      <div className="px-5 pb-10 animate-slide-up">
+        <p className="text-white/40 text-xs font-bold uppercase tracking-widest text-center mb-4">Pilih Modul</p>
+
+        {/* Inbound */}
+        <button
+          onClick={() => setRole('inbound')}
+          className="press-scale w-full mb-3 flex items-center gap-4 p-5 rounded-3xl text-left"
+          style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.2)' }}
+        >
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.15)' }}>
+            📦
+          </div>
+          <div className="flex-1">
+            <h3 className="font-black text-white text-base">Inbound</h3>
+            <p className="text-white/50 text-xs font-medium mt-0.5">Penerimaan Barang Masuk</p>
+          </div>
+          <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
+            <svg width="14" height="14" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6"/>
+            </svg>
+          </div>
+        </button>
+
+        {/* Outbound */}
+        <button
+          onClick={() => setRole('outbound')}
+          className="press-scale w-full flex items-center gap-4 p-5 rounded-3xl text-left"
+          style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.15)' }}
+        >
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.12)' }}>
+            🚚
+          </div>
+          <div className="flex-1">
+            <h3 className="font-black text-white text-base">Outbound</h3>
+            <p className="text-white/50 text-xs font-medium mt-0.5">Pengiriman Multi-Drop</p>
+          </div>
+          <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.1)' }}>
+            <svg width="14" height="14" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6"/>
+            </svg>
+          </div>
+        </button>
+
+        <p className="text-center text-white/20 text-xs font-medium mt-6">B-Log Operasional © 2025</p>
       </div>
     </div>
   );
@@ -579,48 +625,36 @@ export default function App() {
         {/* TOAST */}
         {toast && <Toast {...toast} />}
 
-        {/* ── HEADER ── */}
-        <div className="relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${gradFrom} 0%, ${gradTo} 100%)` }}>
-          {/* Deco circles */}
-          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full opacity-10" style={{ background: '#fff' }}/>
-          <div className="absolute top-4 right-20 w-10 h-10 rounded-full opacity-10" style={{ background: '#fff' }}/>
+        {/* ── HEADER (compact) ── */}
+        <div className="relative flex-shrink-0" style={{ background: `linear-gradient(135deg, ${gradFrom} 0%, ${gradTo} 100%)` }}>
+          <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-10" style={{ background: '#fff' }}/>
+          <div className="absolute top-2 right-16 w-8 h-8 rounded-full opacity-10" style={{ background: '#fff' }}/>
 
-          <div className="relative z-10 px-5 pt-12 pb-7">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-white/70 text-xs font-bold uppercase tracking-widest">B-Log Operasional</p>
-                <h1 className="text-2xl font-black text-white mt-0.5">{title}</h1>
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"/>
-                  <span className="text-white/70 text-xs font-semibold">Online</span>
-                </div>
+          <div className="relative z-10 px-5 pt-10 pb-4 flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">B-Log Operasional</p>
+              <h1 className="text-xl font-black text-white leading-tight">{title}</h1>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"/>
+                <span className="text-white/60 text-[10px] font-semibold">Online</span>
+                {cart.length > 0 && (
+                  <span className="ml-2 text-[10px] font-black text-white/80">🛒 {cart.length} item</span>
+                )}
               </div>
-              <button
-                onClick={() => setShowLogoutConfirm(true)}
-                className="press-scale w-11 h-11 rounded-2xl flex items-center justify-center border transition-all"
-                style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', borderColor: 'rgba(255,255,255,0.2)' }}
-              >
-                <svg width="18" height="18" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                </svg>
-              </button>
             </div>
-
-            {/* Cart badge on header */}
-            {cart.length > 0 && (
-              <div className="mt-4 flex items-center gap-2 px-4 py-3 rounded-2xl" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)' }}>
-                <span className="text-lg">🛒</span>
-                <span className="text-white text-sm font-bold">{cart.length} item di keranjang</span>
-                <div className="ml-auto w-6 h-6 rounded-full bg-white flex items-center justify-center">
-                  <span className="text-xs font-black" style={{ color: accent }}>{cart.length}</span>
-                </div>
-              </div>
-            )}
+            <button
+              onClick={() => setShowLogoutConfirm(true)}
+              className="press-scale w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' }}
+            >
+              <svg width="15" height="15" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+              </svg>
+            </button>
           </div>
 
-          {/* Bottom wave */}
-          <svg className="w-full block" style={{ marginTop: -1 }} height="24" viewBox="0 0 400 24" preserveAspectRatio="none">
-            <path d="M0,24 C150,0 250,0 400,24 L400,24 L0,24 Z" fill="#f0f2f5"/>
+          <svg className="w-full block" style={{ marginTop: -1 }} height="18" viewBox="0 0 400 18" preserveAspectRatio="none">
+            <path d="M0,18 C150,0 250,0 400,18 L400,18 L0,18 Z" fill="#f0f2f5"/>
           </svg>
         </div>
 
@@ -920,40 +954,36 @@ export default function App() {
           )}
         </div>
 
-        {/* ── BOTTOM NAVIGATION (GoPay Style) — ALWAYS FIXED ── */}
-        <div className="flex-shrink-0 bg-transparent px-3 py-3" style={{ borderTop: '1px solid #f3f4f6' }}>
-          <div className="bg-white rounded-3xl shadow-xl border border-gray-100 px-2 py-2">
-            <div className="flex items-center gap-2">
+        {/* ── BOTTOM NAVIGATION (slim, GoPay style) ── */}
+        <div className="flex-shrink-0 px-3 py-2" style={{ background: '#fff', borderTop: '1px solid #f3f4f6' }}>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setActiveTab('form')}
+              className="nav-pill flex-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl font-black text-sm press-scale"
+              style={{
+                background: activeTab === 'form' ? `linear-gradient(135deg, ${gradFrom}, ${gradTo})` : 'transparent',
+                color: activeTab === 'form' ? '#fff' : '#9ca3af',
+              }}
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+              <span className="text-xs">Form Input</span>
+            </button>
 
-              <button
-                onClick={() => setActiveTab('form')}
-                className="nav-pill flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-black text-sm press-scale"
-                style={{
-                  background: activeTab === 'form' ? `linear-gradient(135deg, ${gradFrom}, ${gradTo})` : 'transparent',
-                  color: activeTab === 'form' ? '#fff' : '#9ca3af',
-                }}
-              >
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-                Form Input
-              </button>
-
-              <button
-                onClick={() => setActiveTab('history')}
-                className="nav-pill flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-black text-sm press-scale"
-                style={{
-                  background: activeTab === 'history' ? `linear-gradient(135deg, ${gradFrom}, ${gradTo})` : 'transparent',
-                  color: activeTab === 'history' ? '#fff' : '#9ca3af',
-                }}
-              >
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Riwayat
-              </button>
-
-            </div>
+            <button
+              onClick={() => setActiveTab('history')}
+              className="nav-pill flex-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl font-black text-sm press-scale"
+              style={{
+                background: activeTab === 'history' ? `linear-gradient(135deg, ${gradFrom}, ${gradTo})` : 'transparent',
+                color: activeTab === 'history' ? '#fff' : '#9ca3af',
+              }}
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span className="text-xs">Riwayat</span>
+            </button>
           </div>
         </div>
 
