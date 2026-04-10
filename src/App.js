@@ -248,6 +248,7 @@ export default function App() {
   const [supplier, setSupplier] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState('');
   const [mainPhoto, setMainPhoto] = useState(null);
+  const [mainPhotos, setMainPhotos] = useState([]);
   const [defectPhoto, setDefectPhoto] = useState(null);
 
   const [resto, setResto] = useState('');
@@ -264,8 +265,9 @@ export default function App() {
   const [searchHistory, setSearchHistory] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
 
-  const mainPhotoRef = useRef(null);
+  const mainPhotoRef  = useRef(null);
   const defectPhotoRef = useRef(null);
+  const multiPhotoRef  = useRef(null);
 
   const isOutbound = role === 'outbound';
   const themeColor = isOutbound ? 'blue' : 'red';
@@ -289,7 +291,7 @@ export default function App() {
     setDate(getTodayDate()); setNopol(''); setSupplier('');
     setSelectedCustomer(''); setResto(''); setSelectedItem('');
     setSku(''); setQty(''); setExpDate(''); setKeterangan('');
-    setMainPhoto(null); setDefectPhoto(null); setCart([]);
+    setMainPhoto(null); setMainPhotos([]); setDefectPhoto(null); setCart([]);
     setSearchHistory('');
   };
 
@@ -355,6 +357,43 @@ export default function App() {
     reader.readAsDataURL(file);
   };
 
+  // Multi-photo handler (outbound hanya)
+  const handleMultiPhotoCapture = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    e.target.value = ''; // reset agar bisa ambil foto yang sama lagi
+    if (mainPhotos.length >= 6) { showToast('Maksimal 6 foto muatan!', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX = 1024;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const barH = 90;
+        ctx.fillStyle = 'rgba(0,0,0,0.75)';
+        ctx.fillRect(0, h - barH, w, barH);
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#60a5fa';
+        ctx.font = 'bold 20px Arial';
+        ctx.fillText(`B-LOG OUTBOUND - FOTO MUATAN #${mainPhotos.length + 1}`, 16, h - 54);
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 30px Arial';
+        ctx.fillText(nopol.toUpperCase(), 16, h - 18);
+        ctx.textAlign = 'right'; ctx.fillStyle = '#ddd'; ctx.font = 'bold 16px monospace';
+        const d = new Date();
+        ctx.fillText(`${d.toLocaleDateString('id-ID')} ${d.toLocaleTimeString('id-ID')}`, w - 16, h - 18);
+        const b64 = canvas.toDataURL('image/jpeg', 0.65);
+        setMainPhotos(prev => [...prev, b64]);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleAddToCart = () => {
     if (isOutbound) {
       if (!resto || !selectedCustomer || !selectedItem || !qty || !expDate) {
@@ -378,11 +417,23 @@ export default function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const ok = isOutbound
-      ? (date && nopol && cart.length > 0 && mainPhoto)
+      ? (date && nopol && cart.length > 0 && mainPhotos.length > 0)
       : (date && nopol && supplier && selectedCustomer && cart.length > 0 && mainPhoto);
-    if (!ok) { showToast('Lengkapi data, keranjang, & foto!', 'error'); return; }
+    if (!ok) {
+      showToast(isOutbound ? 'Lengkapi data, keranjang & min. 1 foto muatan!' : 'Lengkapi data, keranjang, & foto!', 'error');
+      return;
+    }
     setIsLoading(true);
-    const payload = { type: role, date, nopol, supplier: role==='inbound'?supplier:'', customer: role==='inbound'?selectedCustomer:'', keterangan, mainPhoto, defectPhoto, items: cart };
+    const payload = {
+      type: role, date, nopol,
+      supplier: role === 'inbound' ? supplier : '',
+      customer: role === 'inbound' ? selectedCustomer : '',
+      keterangan,
+      mainPhoto: isOutbound ? null : mainPhoto,
+      mainPhotos: isOutbound ? mainPhotos : null,
+      defectPhoto,
+      items: cart,
+    };
     try {
       const url = 'https://script.google.com/macros/s/AKfycbxeoOK8BxfrT2Guk3GGh70v15IITYZYQCOA4K_ek3c8n3BkQ080z4Buqyp0DT9prNi6Mw/exec';
       const res = await fetch(url, { method:'POST', body:JSON.stringify(payload), headers:{'Content-Type':'text/plain;charset=utf-8'} });
@@ -390,7 +441,7 @@ export default function App() {
       if (result.status === 'success') {
         showToast('Truk berhasil diproses! 🚀');
         setNopol(''); setSupplier(''); setSelectedCustomer(''); setResto('');
-        setKeterangan(''); setMainPhoto(null); setDefectPhoto(null); setCart([]);
+        setKeterangan(''); setMainPhoto(null); setMainPhotos([]); setDefectPhoto(null); setCart([]);
         setDate(getTodayDate());
       } else { showToast('Gagal: ' + result.message, 'error'); }
     } catch { showToast('Koneksi terputus.', 'error'); }
@@ -789,31 +840,95 @@ export default function App() {
 
               {/* CARD: Foto */}
               <div className="card-3 bg-white rounded-3xl p-5 shadow-sm border border-gray-50">
-                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">
-                  {isOutbound ? 'Foto Muatan' : 'Foto Kendaraan'} <span className="text-red-500">*</span>
-                </p>
-                {mainPhoto ? (
-                  <div className="relative rounded-2xl overflow-hidden shadow-md">
-                    <img src={mainPhoto} alt="main" className="w-full h-40 object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"/>
-                    <button type="button" onClick={() => setMainPhoto(null)} className="press-scale absolute top-3 right-3 w-8 h-8 bg-red-500 text-white rounded-xl flex items-center justify-center shadow-lg">
-                      <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                    <span className="absolute bottom-3 left-3 text-white text-xs font-bold">✅ Foto tersimpan</span>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                    {isOutbound ? 'Foto Muatan' : 'Foto Kendaraan'} <span className="text-red-500">*</span>
+                  </p>
+                  {isOutbound && mainPhotos.length > 0 && (
+                    <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: accentSoft, color: accent }}>
+                      {mainPhotos.length}/6 Foto
+                    </span>
+                  )}
+                </div>
+
+                {isOutbound ? (
+                  /* ── OUTBOUND: Multi-Photo Grid ── */
+                  <div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {mainPhotos.map((p, i) => (
+                        <div key={i} className="relative rounded-2xl overflow-hidden" style={{ aspectRatio: '1' }}>
+                          <img src={p} alt={`foto-${i+1}`} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                          <button
+                            type="button"
+                            onClick={() => setMainPhotos(prev => prev.filter((_, j) => j !== i))}
+                            className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-lg flex items-center justify-center shadow"
+                          >
+                            <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                          </button>
+                          <span className="absolute bottom-1.5 left-1.5 text-white text-[10px] font-black bg-black/40 px-1.5 py-0.5 rounded-md">
+                            #{i+1}
+                          </span>
+                        </div>
+                      ))}
+
+                      {mainPhotos.length < 6 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!nopol.trim()) { showToast('Isi NOPOL terlebih dahulu!', 'error'); return; }
+                            multiPhotoRef.current.click();
+                          }}
+                          className="press-scale rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-1 transition-all"
+                          style={{ aspectRatio: '1', borderColor: accent, background: accentSoft }}
+                        >
+                          <svg width="20" height="20" fill="none" stroke={accent} strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                          </svg>
+                          <span className="text-[10px] font-black" style={{ color: accent }}>+ Foto</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {mainPhotos.length === 0 && (
+                      <p className="text-center text-xs text-gray-400 font-semibold mt-2">Tambah foto muatan (maks 6)</p>
+                    )}
+                    <input
+                      type="file" accept="image/*" capture="environment"
+                      ref={multiPhotoRef}
+                      onChange={handleMultiPhotoCapture}
+                      className="hidden"
+                    />
                   </div>
                 ) : (
-                  <button type="button" onClick={() => triggerCamera(mainPhotoRef)}
-                    className="press-scale w-full h-28 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all"
-                    style={{ borderColor: accent, background: accentSoft }}>
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: accent }}>
-                      <svg width="18" height="18" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                      </svg>
-                    </div>
-                    <span className="text-sm font-bold" style={{ color: accent }}>Ambil Foto</span>
-                  </button>
+                  /* ── INBOUND: Single Photo ── */
+                  <>
+                    {mainPhoto ? (
+                      <div className="relative rounded-2xl overflow-hidden shadow-md">
+                        <img src={mainPhoto} alt="main" className="w-full h-40 object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"/>
+                        <button type="button" onClick={() => setMainPhoto(null)} className="press-scale absolute top-3 right-3 w-8 h-8 bg-red-500 text-white rounded-xl flex items-center justify-center shadow-lg">
+                          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                        <span className="absolute bottom-3 left-3 text-white text-xs font-bold">✅ Foto tersimpan</span>
+                      </div>
+                    ) : (
+                      <button type="button" onClick={() => triggerCamera(mainPhotoRef)}
+                        className="press-scale w-full h-28 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all"
+                        style={{ borderColor: accent, background: accentSoft }}>
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: accent }}>
+                          <svg width="18" height="18" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                          </svg>
+                        </div>
+                        <span className="text-sm font-bold" style={{ color: accent }}>Ambil Foto</span>
+                      </button>
+                    )}
+                    <input type="file" accept="image/*" capture="environment" ref={mainPhotoRef} onChange={e => handlePhotoCapture(e,'main')} className="hidden" />
+                  </>
                 )}
-                <input type="file" accept="image/*" capture="environment" ref={mainPhotoRef} onChange={e => handlePhotoCapture(e,'main')} className="hidden" />
               </div>
 
               <div className="card-4 bg-white rounded-3xl p-5 shadow-sm border border-gray-50">
