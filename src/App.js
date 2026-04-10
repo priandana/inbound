@@ -53,14 +53,14 @@ const getTodayDate = () => {
 const getDriveDirectUrl = (driveUrl) => {
   if (!driveUrl) return '';
   const match = driveUrl.match(/\/d\/(.+?)\//);
-  if (match && match) return `https://drive.google.com/thumbnail?id=${match}&sz=w1000`;
+  if (match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
   return driveUrl;
 };
 
 // --- KOMPONEN DROPDOWN CUSTOM (SUPER APP STYLE) ---
 const CustomSelect = ({ value, onChange, options, placeholder, disabled, role }) => {
-  const = useState(false);
-  const = useState(value);
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState(value);
   const wrapperRef = useRef(null);
 
   const focusRing = role === 'outbound' ? 'focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200' : 'focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-200';
@@ -69,7 +69,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
 
   useEffect(() => {
     setSearch(value);
-  },);
+  }, [value]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -80,7 +80,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  },);
+  }, [value]);
 
   const filtered = options.filter(opt => opt.toLowerCase().includes(search.toLowerCase()));
 
@@ -125,7 +125,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
 export default function App() {
 
   useEffect(() => {
-    let meta = document.querySelector("meta");
+    let meta = document.querySelector("meta[name='viewport']");
     if (!meta) {
       meta = document.createElement('meta');
       meta.name = 'viewport';
@@ -134,35 +134,35 @@ export default function App() {
     meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
   }, []);
 
-  const = useState(null);
-  const = useState(false);
-  const = useState('');
-  const = useState(false);
-  const = useState('form');
-  const = useState(false);
-  const = useState(false);
-  const = useState(null);
+  const [role, setRole] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState(false);
+  const [activeTab, setActiveTab] = useState('form');
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState(null);
 
-  const = useState(getTodayDate());
-  const = useState('');
-  const = useState('');
-  const = useState('');
-  const = useState(null);
-  const = useState(null);
+  const [date, setDate] = useState(getTodayDate());
+  const [nopol, setNopol] = useState('');
+  const [supplier, setSupplier] = useState('');
+  const [selectedCustomer, setSelectedCustomer] = useState('');
+  const [mainPhoto, setMainPhoto] = useState(null);
+  const [defectPhoto, setDefectPhoto] = useState(null);
 
-  const = useState('');
-  const = useState('');
-  const = useState('');
-  const = useState('');
-  const = useState('');
-  const = useState('');
-  const = useState([]);
+  const [resto, setResto] = useState('');
+  const [selectedItem, setSelectedItem] = useState('');
+  const [sku, setSku] = useState('');
+  const [qty, setQty] = useState('');
+  const [expDate, setExpDate] = useState('');
+  const [keterangan, setKeterangan] = useState('');
+  const [cart, setCart] = useState([]);
 
-  const = useState([]);
-  const = useState(false);
-  const = useState('');
-  const = useState('');
-  const = useState(null);
+  const [historyData, setHistoryData] = useState([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [historyError, setHistoryError] = useState('');
+  const [searchHistory, setSearchHistory] = useState('');
+  const [previewImage, setPreviewImage] = useState(null);
 
   const mainPhotoInputRef = useRef(null);
   const defectPhotoInputRef = useRef(null);
@@ -227,7 +227,7 @@ export default function App() {
   };
 
   const handlePhotoCapture = (e, type) => {
-    const file = e.target.files;
+    const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
@@ -292,13 +292,13 @@ export default function App() {
         showToast('Lengkapi semua data barang!', 'error');
         return;
       }
-      setCart();
+      setCart([...cart, { resto, customer: selectedCustomer, item: selectedItem, sku, qty, expDate }]);
     } else {
       if (!selectedItem || !qty || !expDate) {
         showToast('Lengkapi data barang!', 'error');
         return;
       }
-      setCart();
+      setCart([...cart, { item: selectedItem, sku, qty, expDate }]);
     }
 
     setSelectedItem('');
@@ -309,7 +309,7 @@ export default function App() {
   };
 
   const handleRemoveFromCart = (index) => {
-    const newCart =;
+    const newCart = [...cart];
     newCart.splice(index, 1);
     setCart(newCart);
   };
@@ -411,13 +411,13 @@ export default function App() {
     } finally {
       setIsLoadingHistory(false);
     }
-  },);
+  }, [role]);
 
   useEffect(() => {
     if (activeTab === 'history' && isAuthenticated) {
       fetchHistory();
     }
-  },);
+  }, [activeTab, isAuthenticated, fetchHistory]);
 
   const handleShareWA = (group) => {
     let text = `*${role.toUpperCase()} REPORT - B-LOG*\n\n*Waktu:* ${group.timestamp}\n*Nopol:* ${group.nopol}\n`;
@@ -430,14 +430,14 @@ export default function App() {
       text += `\n*PENGIRIMAN MULTI-DROP:*\n`;
       const restoMap = {};
       group.items.forEach(it => {
-        if (!restoMap) {
-          restoMap = [];
+        if (!restoMap[it.resto]) {
+          restoMap[it.resto] = [];
         }
-        restoMap.push(it);
+        restoMap[it.resto].push(it);
       });
       Object.keys(restoMap).forEach(restoName => {
         text += `\n📍 *${restoName}*\n`;
-        restoMap.forEach(it => {
+        restoMap[restoName].forEach(it => {
           text += `- ${it.item} (*${it.qty} CTN*)\n`;
         });
       });
@@ -492,7 +492,7 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50 flex justify-center items-center font-sans md:p-4">
-        <div className="w-full max-w-md bg-white md:rounded-3xl shadow-2xl text-center relative overflow-hidden h-screen md:h- flex flex-col animate-fade-in">
+        <div className="w-full max-w-md bg-white md:rounded-3xl shadow-2xl text-center relative overflow-hidden h-screen md:h-auto flex flex-col animate-fade-in">
           {/* Header Melengkung OVO/DANA Style */}
           <div className={`w-full h-64 bg-gradient-to-b ${theme.gradient} rounded-b-3xl relative flex flex-col items-center justify-center`}>
             <button onClick={() => setRole(null)} className="absolute top-6 left-6 text-white/80 hover:text-white z-20 flex items-center gap-1 text-sm font-bold">
@@ -507,11 +507,11 @@ export default function App() {
               <p className="text-sm text-gray-500 font-bold mb-6 uppercase tracking-wider">Masukkan PIN Anda</p>
               <input
                 type="password"
-                pattern="*"
+                pattern="[0-9]*"
                 inputMode="numeric"
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
-                className={`w-full text-center tracking- font-black text-3xl py-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white outline-none transition-all duration-300 ${pinError ? 'border-red-400 text-red-600 animate-pulse' : theme.ring}`}
+                className={`w-full text-center font-black text-3xl py-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white outline-none transition-all duration-300 ${pinError ? 'border-red-400 text-red-600 animate-pulse' : theme.ring}`}
                 placeholder="••••"
                 maxLength={4}
               />
@@ -531,11 +531,11 @@ export default function App() {
   // =========================================================
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans md:p-4 relative">
-      <div className="w-full max-w-md bg-gray-50 md:rounded-3xl shadow-2xl overflow-hidden relative h-screen md:h- flex flex-col animate-fade-in">
+      <div className="w-full max-w-md bg-gray-50 md:rounded-3xl shadow-2xl overflow-hidden relative h-screen md:h-auto flex flex-col animate-fade-in">
 
         {/* TOAST */}
         {toast && (
-          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-11/12 max-w-sm z-">
+          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-11/12 max-w-sm z-50">
             <div className={`p-4 rounded-2xl shadow-2xl flex items-center gap-3 text-white ${toast.type === 'success' ? 'bg-gray-900' : 'bg-red-600'}`}>
               <p className="text-sm font-bold tracking-wide">{toast.msg}</p>
             </div>
@@ -565,11 +565,11 @@ export default function App() {
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div>
                     <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Tanggal</label>
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all appearance-none min-h- ${theme.ring} focus:bg-white`} />
+                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all appearance-none ${theme.ring} focus:bg-white`} />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Nopol</label>
-                    <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all min-h- ${theme.ring} focus:bg-white`} />
+                    <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all ${theme.ring} focus:bg-white`} />
                   </div>
                 </div>
 
@@ -577,7 +577,7 @@ export default function App() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Supplier Asal</label>
-                      <input type="text" placeholder="Ketik Nama Vendor..." value={supplier} onChange={(e) => setSupplier(e.target.value.toUpperCase())} disabled={cart.length > 0} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all min-h- ${theme.ring} focus:bg-white disabled:opacity-60`} />
+                      <input type="text" placeholder="Ketik Nama Vendor..." value={supplier} onChange={(e) => setSupplier(e.target.value.toUpperCase())} disabled={cart.length > 0} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all ${theme.ring} focus:bg-white disabled:opacity-60`} />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Customer Origin</label>
@@ -594,7 +594,7 @@ export default function App() {
                     <>
                       <div>
                         <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Resto Tujuan</label>
-                        <input type="text" value={resto} onChange={(e) => setResto(e.target.value)} placeholder="Contoh: Gacoan Dago" className={`w-full bg-white border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold outline-none transition-all min-h- ${theme.ring}`} />
+                        <input type="text" value={resto} onChange={(e) => setResto(e.target.value)} placeholder="Contoh: Gacoan Dago" className={`w-full bg-white border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold outline-none transition-all ${theme.ring}`} />
                       </div>
                       <div>
                         <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Customer</label>
@@ -611,17 +611,17 @@ export default function App() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>SKU</label>
-                      <input type="text" value={sku} readOnly className="w-full bg-black/5 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-mono text-gray-500 outline-none min-h-" />
+                      <input type="text" value={sku} readOnly className="w-full bg-black/5 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-mono text-gray-500 outline-none" />
                     </div>
                     <div>
                       <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>QTY (CTN)</label>
-                      <input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="0" className={`w-full bg-white border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all min-h- ${theme.ring}`} />
+                      <input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="0" className={`w-full bg-white border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all ${theme.ring}`} />
                     </div>
                   </div>
 
                   <div>
                     <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Expired Date</label>
-                    <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className={`w-full bg-white border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all min-h- appearance-none ${theme.ring}`} />
+                    <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className={`w-full bg-white border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all appearance-none ${theme.ring}`} />
                   </div>
 
                   <button type="button" onClick={handleAddToCart} className={`w-full mt-2 bg-white ${theme.text} border-2 border-transparent hover:border-current font-black text-sm py-3.5 rounded-xl transition-all shadow-sm active:scale-95`}>
@@ -729,7 +729,7 @@ export default function App() {
         </div>
 
         {/* DOCKED BOTTOM NAVIGATION (NATIVE APP STYLE) */}
-        <div className="absolute bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 pb-safe">
+        <div className="absolute bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100">
           <div className="flex justify-around items-center px-2 py-2">
             <button onClick={() => setActiveTab('form')} className={`flex flex-col items-center justify-center w-full py-2 ${activeTab === 'form' ? theme.text : 'text-gray-400'} transition-colors`}>
               <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
