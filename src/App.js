@@ -95,13 +95,18 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeCo
 
   const filtered = options.filter(o => o.toLowerCase().includes((search||'').toLowerCase()));
 
-  // Hitung posisi dropdown langsung dari DOM saat render
+  // Hitung posisi dropdown — otomatis flip ke atas kalau ruang bawah tidak cukup
   const getDropStyle = () => {
     if (!wrapperRef.current) return {};
     const r = wrapperRef.current.getBoundingClientRect();
+    const ITEM_HEIGHT = 52; // approx per item
+    const listH = Math.min(filtered.length * ITEM_HEIGHT + 16, 320);
+    const spaceBelow = window.innerHeight - r.bottom - 8;
+    const spaceAbove = r.top - 8;
+    const flipUp = spaceBelow < listH && spaceAbove > spaceBelow;
     return {
       position: 'fixed',
-      top: r.bottom + 6,
+      top: flipUp ? r.top - listH : r.bottom + 6,
       left: r.left,
       width: r.width,
       zIndex: 99999,
@@ -109,35 +114,16 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeCo
       border: '1px solid #f3f4f6',
       borderRadius: 20,
       boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
-      maxHeight: 220,
+      maxHeight: Math.min(listH, Math.max(spaceBelow, spaceAbove) - 8),
       overflowY: 'auto',
     };
   };
 
-  const DropdownPortal = () => {
-    if (!isOpen || disabled) return null;
-    return ReactDOM.createPortal(
-      <ul className="custom-scrollbar py-2" style={getDropStyle()}>
-        {filtered.length > 0 ? filtered.map((opt, i) => (
-          <li
-            key={i}
-            onMouseDown={e => { e.preventDefault(); onChange(opt); setIsOpen(false); }}
-            className="px-4 py-3.5 cursor-pointer text-sm font-semibold text-gray-700 border-b border-gray-50 last:border-0"
-            onMouseEnter={e => e.currentTarget.style.background = themeColor==='blue'?'#eff6ff':'#fef2f2'}
-            onMouseLeave={e => e.currentTarget.style.background = ''}
-          >
-            {opt}
-          </li>
-        )) : (
-          <li className="px-4 py-3.5 text-sm text-gray-400 text-center italic">Tidak ditemukan</li>
-        )}
-      </ul>,
-      document.body
-    );
-  };
+  const dropStyle = isOpen && !disabled ? getDropStyle() : null;
 
   return (
     <div ref={wrapperRef}>
+      {/* Input trigger */}
       <div className="relative">
         <input
           type="text"
@@ -159,7 +145,27 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeCo
           </svg>
         </div>
       </div>
-      <DropdownPortal />
+
+      {/* Portal: render ke document.body agar tidak terpotong scroll/overflow apapun */}
+      {dropStyle && ReactDOM.createPortal(
+        <ul style={dropStyle}>
+          {filtered.length > 0 ? filtered.map((opt, i) => (
+            <li
+              key={i}
+              onMouseDown={e => { e.preventDefault(); onChange(opt); setIsOpen(false); }}
+              onTouchEnd={e => { e.preventDefault(); onChange(opt); setIsOpen(false); }}
+              style={{ padding: '14px 16px', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#374151', borderBottom: i < filtered.length - 1 ? '1px solid #f9fafb' : 'none' }}
+              onMouseEnter={e => e.currentTarget.style.background = themeColor==='blue'?'#eff6ff':'#fef2f2'}
+              onMouseLeave={e => e.currentTarget.style.background = ''}
+            >
+              {opt}
+            </li>
+          )) : (
+            <li style={{ padding: '14px 16px', fontSize: 13, color: '#9ca3af', textAlign: 'center', fontStyle: 'italic' }}>Tidak ditemukan</li>
+          )}
+        </ul>,
+        document.body
+      )}
     </div>
   );
 };
