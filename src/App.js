@@ -66,8 +66,8 @@ const getDriveDirectUrl = (driveUrl) => {
 const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeColor }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState(value || '');
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0, width: 0 });
   const wrapperRef = useRef(null);
-  const inputRef = useRef(null);
 
   useEffect(() => { setSearch(value || ''); }, [value]);
 
@@ -78,22 +78,43 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeCo
         setSearch(value || '');
       }
     };
+    const handleScroll = () => {
+      if (isOpen) {
+        // update position on scroll
+        if (wrapperRef.current) {
+          const r = wrapperRef.current.getBoundingClientRect();
+          setDropPos({ top: r.bottom + 4, left: r.left, width: r.width });
+        }
+      }
+    };
     document.addEventListener('mousedown', handleOut);
-    return () => document.removeEventListener('mousedown', handleOut);
-  }, [value]);
+    document.addEventListener('scroll', handleScroll, true);
+    return () => {
+      document.removeEventListener('mousedown', handleOut);
+      document.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [value, isOpen]);
+
+  const openDropdown = () => {
+    if (disabled) return;
+    if (wrapperRef.current) {
+      const r = wrapperRef.current.getBoundingClientRect();
+      setDropPos({ top: r.bottom + 4, left: r.left, width: r.width });
+    }
+    setIsOpen(true);
+  };
 
   const filtered = options.filter(o => o.toLowerCase().includes((search||'').toLowerCase()));
   const accent = themeColor === 'blue' ? '#3b82f6' : '#ef4444';
 
   return (
-    <div className="relative" ref={wrapperRef}>
+    <div ref={wrapperRef}>
       <div className="relative">
         <input
-          ref={inputRef}
           type="text"
           value={search}
-          onChange={e => { setSearch(e.target.value); setIsOpen(true); }}
-          onFocus={() => !disabled && setIsOpen(true)}
+          onChange={e => { setSearch(e.target.value); if (!isOpen) openDropdown(); }}
+          onFocus={openDropdown}
           placeholder={placeholder}
           disabled={disabled}
           readOnly={disabled}
@@ -103,21 +124,37 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeCo
         <div
           className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
           style={{ transition: 'transform 0.25s', transform: isOpen ? 'translateY(-50%) rotate(180deg)' : 'translateY(-50%) rotate(0deg)' }}
-          onClick={() => !disabled && setIsOpen(v => !v)}
+          onClick={() => isOpen ? setIsOpen(false) : openDropdown()}
         >
           <svg width="18" height="18" fill="none" stroke={disabled ? '#ccc' : accent} strokeWidth="2.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
           </svg>
         </div>
       </div>
+
+      {/* Dropdown pakai position:fixed agar tidak terpotong scroll container */}
       {isOpen && !disabled && (
-        <ul className="dropdown-enter absolute z-50 w-full bg-white border border-gray-100 rounded-2xl shadow-2xl max-h-52 overflow-y-auto mt-2 top-full custom-scrollbar py-2">
+        <ul
+          className="dropdown-enter custom-scrollbar py-2"
+          style={{
+            position: 'fixed',
+            top: dropPos.top,
+            left: dropPos.left,
+            width: dropPos.width,
+            zIndex: 9999,
+            background: '#fff',
+            border: '1px solid #f3f4f6',
+            borderRadius: 20,
+            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+            maxHeight: 220,
+            overflowY: 'auto',
+          }}
+        >
           {filtered.length > 0 ? filtered.map((opt, i) => (
             <li
               key={i}
               onClick={() => { onChange(opt); setIsOpen(false); }}
-              className="px-4 py-3.5 cursor-pointer text-sm font-semibold text-gray-700 transition-colors border-b border-gray-50 last:border-0 active:scale-95"
-              style={{ ':hover': { background: '#fef2f2' } }}
+              className="px-4 py-3.5 cursor-pointer text-sm font-semibold text-gray-700 border-b border-gray-50 last:border-0"
               onMouseEnter={e => e.currentTarget.style.background = themeColor==='blue'?'#eff6ff':'#fef2f2'}
               onMouseLeave={e => e.currentTarget.style.background = ''}
             >
@@ -133,14 +170,13 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeCo
 };
 
 // ─── DATE PICKER BUTTON ─────────────────────────────────────────────────────────
-const DatePickerBtn = ({ value, onChange, themeColor }) => {
+const DatePickerBtn = ({ value, onChange, themeColor, label = 'Tanggal', placeholder = 'Pilih Tanggal' }) => {
   const ref = useRef(null);
   const accent = themeColor === 'blue' ? '#3b82f6' : '#ef4444';
   const bgSoft = themeColor === 'blue' ? '#eff6ff' : '#fef2f2';
   return (
     <div
       className="relative w-full flex items-center gap-3 bg-white border-2 border-gray-100 rounded-2xl px-4 py-3.5 shadow-sm cursor-pointer press-scale"
-      style={{ borderColor: 'transparent' }}
       onClick={() => { try { ref.current.showPicker(); } catch(e) { ref.current.click(); } }}
     >
       <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: bgSoft }}>
@@ -152,8 +188,10 @@ const DatePickerBtn = ({ value, onChange, themeColor }) => {
         </svg>
       </div>
       <div className="flex-1">
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-0.5">Tanggal</p>
-        <p className="text-sm font-bold text-gray-800">{formatDisplayDate(value)}</p>
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-0.5">{label}</p>
+        <p className="text-sm font-bold" style={{ color: value ? '#1f2937' : '#9ca3af' }}>
+          {value ? formatDisplayDate(value) : placeholder}
+        </p>
       </div>
       <input
         ref={ref}
@@ -161,7 +199,6 @@ const DatePickerBtn = ({ value, onChange, themeColor }) => {
         value={value}
         onChange={onChange}
         className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-        style={{ position: 'absolute' }}
       />
     </div>
   );
@@ -661,22 +698,13 @@ export default function App() {
 
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Expired Date</p>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        value={expDate}
-                        onChange={e => setExpDate(e.target.value)}
-                        className={inputCls}
-                        style={{ caretColor: accent, paddingLeft: expDate ? 16 : 16 }}
-                      />
-                      {!expDate && (
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-semibold pointer-events-none">Pilih Exp. Date</span>
-                      )}
-                      {expDate && (
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-800 pointer-events-none bg-white pr-2">{formatDisplayDate(expDate)}</span>
-                      )}
-                      <input type="date" value={expDate} onChange={e => setExpDate(e.target.value)} className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" />
-                    </div>
+                    <DatePickerBtn
+                      value={expDate}
+                      onChange={e => setExpDate(e.target.value)}
+                      themeColor={themeColor}
+                      placeholder="Pilih Exp. Date"
+                      label="Expired Date"
+                    />
                   </div>
 
                   <button
