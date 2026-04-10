@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './index.css'; 
 
@@ -101,7 +102,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
       </div>
       
       {isOpen && !disabled && (
-        <ul className="absolute z-50 w-full bg-white border border-gray-100 rounded-xl shadow-2xl max-h-56 overflow-y-auto mt-2 top-full custom-scrollbar py-1 origin-top transition-all duration-300">
+        <ul className="absolute z-50 w-full bg-white border border-gray-100 rounded-xl shadow-2xl max-h-56 overflow-y-auto mt-2 top-full custom-scrollbar py-1 animate-fade-in origin-top">
           {filtered.length > 0 ? filtered.map((opt, idx) => (
             <li 
               key={idx} 
@@ -248,7 +249,7 @@ export default function App() {
         ctx.fillRect(0, height - barHeight, width, barHeight);
         
         ctx.textAlign = 'left';
-        ctx.fillStyle = role === 'outbound' ? '#60a5fa' : '#f87171'; // Warna pastel biru/merah
+        ctx.fillStyle = role === 'outbound' ? '#60a5fa' : '#f87171';
         ctx.font = 'bold 22px Arial';
         
         let titleStr = '';
@@ -412,7 +413,6 @@ export default function App() {
   if (!role) {
     return (
       <div className="min-h-screen flex justify-center items-center font-sans p-4 relative overflow-hidden bg-gray-50">
-         {/* Latar Belakang Animasi Gelembung Abstrak */}
          <div className="absolute top-0 left-0 w-96 h-96 bg-red-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
          <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse" style={{ animationDelay: '2s' }}></div>
 
@@ -459,8 +459,7 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50 flex justify-center items-center font-sans text-gray-800 md:p-4">
-        <div className="w-full max-w-md bg-white md:rounded-3xl shadow-2xl p-8 text-center relative overflow-hidden h-screen md:h-[800px] flex flex-col justify-center transition-all duration-500">
-          {/* Latar Belakang Header Login */}
+        <div className="w-full max-w-md bg-white md:rounded-3xl shadow-2xl p-8 text-center relative overflow-hidden h-screen md:h-[800px] flex flex-col justify-center animate-fade-in">
           <div className={`absolute top-0 left-0 w-full h-48 bg-gradient-to-br ${theme.bgGradient} rounded-b-3xl shadow-inner`}></div>
           <button onClick={() => setRole(null)} className="absolute top-6 left-6 text-white/80 hover:text-white z-20 flex items-center gap-1 text-sm font-bold transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg> Batal
@@ -486,7 +485,7 @@ export default function App() {
                 placeholder="••••" 
                 maxLength={4}
               />
-              {pinError && <p className="text-red-500 text-xs font-bold mt-3">PIN tidak valid, silakan coba lagi!</p>}
+              {pinError && <p className="text-red-500 text-xs font-bold mt-3 animate-fade-in">PIN tidak valid, silakan coba lagi!</p>}
             </div>
             <button type="submit" className={`w-full ${theme.bgMain} ${theme.hoverBg} text-white font-black text-lg py-4 rounded-2xl shadow-xl ${theme.shadow} active:scale-95 transition-all duration-300 hover:-translate-y-1`}>
               Buka Kunci
@@ -502,18 +501,16 @@ export default function App() {
   // =========================================================================
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans text-gray-800 md:p-4 relative">
-      <div className="w-full max-w-md bg-gray-50 md:rounded-3xl shadow-2xl overflow-hidden relative h-screen md:h-[800px] flex flex-col transition-all duration-500">
+      <div className="w-full max-w-md bg-gray-50 md:rounded-3xl shadow-2xl overflow-hidden relative h-screen md:h-[800px] flex flex-col animate-fade-in">
         
-        {/* TOAST NOTIFICATION */}
         {toast && (
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 w-11/12 max-w-sm z-[100]">
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 w-11/12 max-w-sm z-[100] animate-fade-in">
             <div className={`p-4 rounded-2xl shadow-2xl flex items-center gap-3 text-white ${toast.type === 'success' ? 'bg-gray-900 border border-gray-700' : 'bg-red-600'}`}>
               <p className="text-sm font-bold tracking-wide">{toast.msg}</p>
             </div>
           </div>
         )}
 
-        {/* HEADER APLIKASI */}
         <div className={`bg-gradient-to-br ${theme.bgGradient} px-6 pt-10 pb-8 rounded-b-3xl shadow-lg relative z-20 flex-shrink-0 transition-colors duration-500`}>
           <div className="flex justify-between items-center text-white">
             <div>
@@ -526,14 +523,11 @@ export default function App() {
           </div>
         </div>
 
-        {/* AREA KONTEN SCROLLABLE */}
         <div className="flex-1 overflow-y-auto px-5 pt-6 pb-28 custom-scrollbar relative z-10">
           
-          {/* TAB FORM INPUT */}
           {activeTab === 'form' ? (
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5 animate-fade-in-up">
               
-              {/* BOX UTAMA (INFO TRUK & SUPPLIER) */}
               <div className={`bg-white rounded-2xl p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
@@ -567,7 +561,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* BOX KERANJANG BARANG */}
               <div className={`bg-white rounded-2xl p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
                 
                 <div className={`space-y-4 p-5 border-2 border-dashed ${theme.borderLight} rounded-2xl ${theme.bgLight} transition-colors`}>
@@ -605,16 +598,15 @@ export default function App() {
                     <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className={`w-full bg-white border-2 border-gray-100 rounded-xl px-3 py-3 text-sm font-bold text-gray-800 outline-none transition-colors ${theme.ringFocus}`}/>
                   </div>
                   
-                  <button type="button" onClick={handleAddToCart} className={`w-full mt-2 bg-white border-2 ${theme.borderMain} ${theme.textMain} hover:bg-opacity-0 hover:${theme.bgMain} font-black text-sm py-3.5 rounded-xl transition-all duration-300 active:scale-95 shadow-sm`}>
+                  <button type="button" onClick={handleAddToCart} className={`w-full mt-2 bg-white border-2 ${theme.borderMain} ${theme.textMain} hover:bg-opacity-0 hover:${theme.bgMain} hover:text-white font-black text-sm py-3.5 rounded-xl transition-all duration-300 active:scale-95 shadow-sm`}>
                     + Tambah Ke Keranjang
                   </button>
                 </div>
 
-                {/* LIST KERANJANG ANIMASI */}
                 {cart.length > 0 && (
                   <div className="mt-5 space-y-3">
                     {cart.map((c, i) => (
-                      <div key={i} className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm hover:border-gray-300 transition-colors">
+                      <div key={i} className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm animate-fade-in-up hover:border-gray-300 transition-colors">
                         <div className="flex-1">
                           {isOutbound && <span className={`text-xs font-black ${theme.textMain} block uppercase tracking-wider mb-1`}>📍 {c.resto}</span>}
                           <p className="font-bold text-sm text-gray-800">{c.item}</p>
@@ -629,7 +621,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* BOX FOTO */}
               <div className={`bg-white rounded-2xl p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
                 <h3 className="font-bold text-sm text-gray-800 mb-3">{isOutbound ? 'Foto Muatan Penuh' : 'Foto Mobil Kosong'} <span className="text-red-500">*</span></h3>
                 {mainPhoto ? (
@@ -661,7 +652,6 @@ export default function App() {
                 <input type="file" accept="image/*" capture="environment" ref={defectPhotoInputRef} onChange={(e) => handlePhotoCapture(e, 'defect')} className="hidden" />
               </div>
 
-              {/* TOMBOL SUBMIT */}
               <button type="submit" disabled={isLoading} className={`w-full ${theme.bgMain} ${theme.hoverBg} text-white font-black text-lg py-5 rounded-2xl shadow-xl ${theme.shadow} active:scale-95 transition-all duration-300 hover:-translate-y-1`}>
                 {isLoading ? 'Sedang Memproses...' : `Kirim Data (${cart.length} Item)`}
               </button>
@@ -669,8 +659,7 @@ export default function App() {
 
           ) : (
 
-            /* TAB HISTORY AESTHETIC */
-            <div className="space-y-5">
+            <div className="space-y-5 animate-fade-in-up">
               <div className="relative shadow-sm rounded-xl overflow-hidden">
                 <input 
                   type="text" 
@@ -738,8 +727,7 @@ export default function App() {
           )}
         </div>
 
-        {/* BOTTOM NAVIGATION FIXED */}
-        <div className="absolute bottom-6 left-6 right-6 z-40">
+        <div className="absolute bottom-6 left-6 right-6 z-40 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <div className="bg-white/90 backdrop-blur-xl p-2 rounded-2xl shadow-lg flex border border-white/50">
             <button onClick={() => setActiveTab('form')} className={`flex-1 py-3 font-black text-xs rounded-xl transition-all duration-300 ${activeTab === 'form' ? `${theme.bgMain} text-white shadow-md transform scale-105` : 'text-gray-400 hover:bg-gray-50'}`}>
               📝 Form Input
@@ -750,9 +738,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* MODAL LOGOUT */}
         {showLogoutConfirm && (
-          <div className="absolute inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="absolute inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
             <div className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-sm text-center transform scale-100 transition-transform">
               <div className={`w-16 h-16 ${theme.bgLight} rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm`}>
                 <svg className={`w-8 h-8 ${theme.textMain}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
@@ -767,9 +754,8 @@ export default function App() {
           </div>
         )}
 
-        {/* MODAL PREVIEW FOTO */}
         {previewImage && (
-          <div className="absolute inset-0 z-50 bg-gray-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4">
+          <div className="absolute inset-0 z-50 bg-gray-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
             <button onClick={() => setPreviewImage(null)} className="absolute top-8 right-8 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 w-12 h-12 rounded-full flex items-center justify-center transition-all">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
