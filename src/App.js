@@ -63,11 +63,12 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
   const = useState(value);
   const wrapperRef = useRef(null);
 
-  const focusRing = role === 'outbound' ? 'focus:ring-blue-500 focus:bg-white' : 'focus:ring-red-500 focus:bg-white';
+  const focusRing = role === 'outbound' ? 'focus:border-blue-500 focus:bg-white' : 'focus:border-red-500 focus:bg-white';
   const iconColor = disabled ? 'text-gray-300' : 'text-gray-400';
   const hoverBg = role === 'outbound' ? 'hover:bg-blue-50' : 'hover:bg-red-50';
 
   useEffect(() => { setSearch(value); },);
+  
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -91,7 +92,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
           onFocus={() => setIsOpen(true)} 
           placeholder={placeholder} 
           disabled={disabled} 
-          className={`w-full bg- border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all duration-200 ${focusRing} min-h- disabled:bg-gray-100 disabled:text-gray-400 pr-10`} 
+          className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all duration-200 ${focusRing} disabled:bg-gray-100 disabled:text-gray-400 pr-10`} 
         />
         <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
           <svg className={`w-4 h-4 ${iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -383,7 +384,8 @@ export default function App() {
       text += `\n*PENGIRIMAN MULTI-DROP:*\n`;
       const restoMap = {};
       group.items.forEach(it => { 
-        if(!restoMap) restoMap = []; restoMap.push(it); 
+        if(!restoMap) restoMap = []; 
+        restoMap.push(it); 
       });
       Object.keys(restoMap).forEach(restoName => {
         text += `\n📍 *${restoName}*\n`;
@@ -403,27 +405,27 @@ export default function App() {
   // TEMA DINAMIS SUPER APP
   const isOutbound = role === 'outbound';
   const theme = isOutbound 
-    ? { gradient: 'from- to-', bgButton: 'bg-', text: 'text-', bgSoft: 'bg-blue-50', ring: 'focus:ring-blue-500', shadow: 'shadow-blue-500/30', title: 'Outbound Hub', icon: '🚚' }  
-    : { gradient: 'from- to-', bgButton: 'bg-', text: 'text-', bgSoft: 'bg-red-50', ring: 'focus:ring-red-500', shadow: 'shadow-red-500/30', title: 'Inbound Hub', icon: '📦' };
+    ? { gradient: 'from-blue-600 to-blue-800', bgButton: 'bg-blue-600', text: 'text-blue-600', bgSoft: 'bg-blue-50', ring: 'focus:border-blue-500 focus:bg-white', shadow: 'shadow-blue-500/30', title: 'Outbound Hub', icon: '🚚' }  
+    : { gradient: 'from-red-600 to-red-800', bgButton: 'bg-red-600', text: 'text-red-600', bgSoft: 'bg-red-50', ring: 'focus:border-red-500 focus:bg-white', shadow: 'shadow-red-500/30', title: 'Inbound Hub', icon: '📦' };
 
   // =========================================================
   // 1. RENDER: HALAMAN PORTAL
   // =========================================================
   if (!role) {
     return (
-      <div className="min-h-screen bg- flex justify-center items-center font-sans p-4">
-         <div className="w-full max-w-md bg-white rounded- shadow- p-8 text-center animate-fade-in">
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center font-sans p-4">
+         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 text-center animate-fade-in">
             <h1 className="text-3xl font-black text-gray-800 mb-2">B-Log App</h1>
             <p className="text-gray-500 text-sm mb-10 font-medium">Pilih modul operasional</p>
             
             <div className="space-y-4">
-               <button onClick={() => setRole('inbound')} className="w-full relative overflow-hidden bg-white border border-gray-200 hover:border- p-6 rounded-2xl transition-all duration-300 hover:shadow-lg group flex items-center gap-4">
+               <button onClick={() => setRole('inbound')} className="w-full relative overflow-hidden bg-white border border-gray-200 hover:border-red-400 p-6 rounded-2xl transition-all duration-300 hover:shadow-lg group flex items-center gap-4">
                  <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">📦</div>
-                 <div className="text-left"><h3 className="font-black text-gray-800 text-lg group-hover:text- transition-colors">Inbound</h3><p className="text-xs text-gray-400 font-medium">Penerimaan Barang</p></div>
+                 <div className="text-left"><h3 className="font-black text-gray-800 text-lg group-hover:text-red-600 transition-colors">Inbound</h3><p className="text-xs text-gray-400 font-medium">Penerimaan Barang</p></div>
                </button>
-               <button onClick={() => setRole('outbound')} className="w-full relative overflow-hidden bg-white border border-gray-200 hover:border- p-6 rounded-2xl transition-all duration-300 hover:shadow-lg group flex items-center gap-4">
+               <button onClick={() => setRole('outbound')} className="w-full relative overflow-hidden bg-white border border-gray-200 hover:border-blue-400 p-6 rounded-2xl transition-all duration-300 hover:shadow-lg group flex items-center gap-4">
                  <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">🚚</div>
-                 <div className="text-left"><h3 className="font-black text-gray-800 text-lg group-hover:text- transition-colors">Outbound</h3><p className="text-xs text-gray-400 font-medium">Pengiriman Multi-Drop</p></div>
+                 <div className="text-left"><h3 className="font-black text-gray-800 text-lg group-hover:text-blue-600 transition-colors">Outbound</h3><p className="text-xs text-gray-400 font-medium">Pengiriman Multi-Drop</p></div>
                </button>
             </div>
          </div>
@@ -436,8 +438,8 @@ export default function App() {
   // =========================================================
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg- flex justify-center items-center font-sans md:p-4">
-        <div className="w-full max-w-md bg-white md:rounded- shadow- text-center relative overflow-hidden h-screen md:h- flex flex-col animate-fade-in">
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center font-sans md:p-4">
+        <div className="w-full max-w-md bg-white md:rounded-3xl shadow-2xl text-center relative overflow-hidden h-screen md:h- flex flex-col animate-fade-in">
           {/* Header Melengkung OVO/DANA Style */}
           <div className={`w-full h-64 bg-gradient-to-b ${theme.gradient} rounded-b- relative flex flex-col items-center justify-center`}>
             <button onClick={() => setRole(null)} className="absolute top-6 left-6 text-white/80 hover:text-white z-20 flex items-center gap-1 text-sm font-bold">
@@ -456,7 +458,7 @@ export default function App() {
                 inputMode="numeric" 
                 value={pinInput} 
                 onChange={(e) => setPinInput(e.target.value)} 
-                className={`w-full text-center tracking- font-black text-3xl py-4 rounded-2xl bg- border-2 border-transparent focus:bg-white outline-none transition-all duration-300 ${pinError ? 'border-red-400 text-red-600 animate-pulse' : theme.ring}`} 
+                className={`w-full text-center tracking- font-black text-3xl py-4 rounded-2xl bg-gray-50 border-2 border-transparent focus:bg-white outline-none transition-all duration-300 ${pinError ? 'border-red-400 text-red-600 animate-pulse' : theme.ring}`} 
                 placeholder="••••" 
                 maxLength={4}
               />
@@ -476,7 +478,7 @@ export default function App() {
   // =========================================================
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans md:p-4 relative">
-      <div className="w-full max-w-md bg- md:rounded- shadow-2xl overflow-hidden relative h-screen md:h- flex flex-col animate-fade-in">
+      <div className="w-full max-w-md bg-gray-50 md:rounded-3xl shadow-2xl overflow-hidden relative h-screen md:h- flex flex-col animate-fade-in">
         
         {/* TOAST */}
         {toast && (
@@ -491,7 +493,7 @@ export default function App() {
         <div className={`bg-gradient-to-r ${theme.gradient} px-5 pt-12 pb-6 rounded-b- shadow-md relative z-20 overflow-hidden`}>
           <div className="flex justify-between items-center text-white relative z-10">
             <div>
-              <p className="text-white/80 text- font-bold uppercase tracking-widest mb-0.5">B-Log Operasional</p>
+              <p className="text-white/80 text-xs font-bold uppercase tracking-widest mb-0.5">B-Log Operasional</p>
               <h1 className="text-2xl font-black">{theme.title}</h1>
             </div>
             <button onClick={() => setShowLogoutConfirm(true)} className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 active:scale-90 transition-transform">
@@ -510,11 +512,11 @@ export default function App() {
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div>
                     <label className="block text- font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Tanggal</label>
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`w-full bg- border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all appearance-none min-h- ${theme.ring} focus:bg-white`}/>
+                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all appearance-none min-h- ${theme.ring}`}/>
                   </div>
                   <div>
                     <label className="block text- font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Nopol</label>
-                    <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className={`w-full bg- border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all min-h- ${theme.ring} focus:bg-white`}/>
+                    <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all min-h- ${theme.ring}`}/>
                   </div>
                 </div>
                 
@@ -522,7 +524,7 @@ export default function App() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text- font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Supplier Asal</label>
-                      <input type="text" placeholder="Ketik Nama Vendor..." value={supplier} onChange={(e) => setSupplier(e.target.value.toUpperCase())} disabled={cart.length > 0} className={`w-full bg- border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all min-h- ${theme.ring} focus:bg-white disabled:opacity-60`}/>
+                      <input type="text" placeholder="Ketik Nama Vendor..." value={supplier} onChange={(e) => setSupplier(e.target.value.toUpperCase())} disabled={cart.length > 0} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all min-h- ${theme.ring} disabled:bg-gray-100 disabled:opacity-60`}/>
                     </div>
                     <div>
                       <label className="block text- font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Customer Origin</label>
@@ -601,7 +603,7 @@ export default function App() {
                     <button type="button" onClick={() => setMainPhoto(null)} className="absolute top-2 right-2 bg-red-600/90 text-white rounded-full p-2 backdrop-blur-sm"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                   </div> 
                 ) : (
-                  <button type="button" onClick={() => triggerCamera(mainPhotoInputRef)} className={`w-full h-24 bg- rounded-xl flex flex-col items-center justify-center font-bold ${theme.text} transition-all active:scale-95`}>
+                  <button type="button" onClick={() => triggerCamera(mainPhotoInputRef)} className={`w-full h-24 bg-gray-50 rounded-xl flex flex-col items-center justify-center font-bold ${theme.text} transition-all active:scale-95`}>
                     <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
                     Ambil Foto
                   </button>
