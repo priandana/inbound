@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './index.css'; 
 
 // --- DATA MASTER ASLI ---
@@ -147,7 +147,7 @@ export default function App() {
   const [mainPhoto, setMainPhoto] = useState(null);
   const [defectPhoto, setDefectPhoto] = useState(null);
   
-  // FITUR BARU: SUPPLIER
+  // FITUR SUPPLIER
   const [supplier, setSupplier] = useState(''); 
 
   const [selectedCustomer, setSelectedCustomer] = useState(''); 
@@ -368,7 +368,8 @@ export default function App() {
     }
   };
 
-  const fetchHistory = async () => {
+  // PENGGUNAAN useCallback UNTUK MENGHILANGKAN WARNING VERCEL
+  const fetchHistory = useCallback(async () => {
     setIsLoadingHistory(true); 
     setHistoryError('');
     try {
@@ -387,7 +388,7 @@ export default function App() {
               timestamp: row.timestamp, 
               date: row.date, 
               nopol: row.nopol, 
-              supplier: row.supplier, // FITUR BARU
+              supplier: row.supplier, 
               customer: row.customer, 
               keterangan: row.keterangan, 
               mainPhotoUrl: row.mainPhotoUrl, 
@@ -414,18 +415,18 @@ export default function App() {
         });
         setHistoryData(grouped);
       } else {
-        setHistoryError('Gagal ambil data.');
+        setHistoryError('Gagal ambil data dari server.');
       }
     } catch (error) { 
-      setHistoryError('Offline/Error.'); 
+      setHistoryError('Gagal memuat. Periksa koneksi internet Anda.'); 
     } finally { 
       setIsLoadingHistory(false); 
     }
-  };
+  }, [role]);
 
   useEffect(() => { 
     if (activeTab === 'history' && isAuthenticated) fetchHistory(); 
-  }, [activeTab, isAuthenticated]);
+  }, [activeTab, isAuthenticated, fetchHistory]);
 
   const handleShareWA = (group) => {
     let text = `*${role.toUpperCase()} REPORT - B-LOG*\n\n*Waktu:* ${group.timestamp}\n*Nopol:* ${group.nopol}\n`;
@@ -738,6 +739,17 @@ export default function App() {
               
               {isLoadingHistory ? (
                 <div className="text-center py-10">Memuat...</div>
+              ) : historyError ? (
+                <div className="bg-red-50 text-red-500 p-4 rounded-xl text-center text-sm font-bold border border-red-200">
+                  {historyError}
+                </div>
+              ) : filteredHistoryData.length === 0 ? (
+                <div className="text-center py-10 text-gray-400 bg-white rounded-3xl border border-dashed border-gray-200">
+                  <svg className="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                  </svg>
+                  <p className="text-sm">Data tidak ditemukan.</p>
+                </div>
               ) : (
                 filteredHistoryData.map((g, i) => (
                   <div key={i} className={`bg-white p-4 rounded-2xl shadow-sm border ${theme.borderLight} relative overflow-hidden`}>
