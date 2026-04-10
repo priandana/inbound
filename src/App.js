@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import './index.css';
 
 // ─── DATA MASTER ───────────────────────────────────────────────────────────────
@@ -63,49 +64,77 @@ const getDriveDirectUrl = (driveUrl) => {
 };
 
 // ─── CUSTOM SELECT ──────────────────────────────────────────────────────────────
+// ─── CUSTOM SELECT ──────────────────────────────────────────────────────────────
 const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeColor }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState(value || '');
-  const [dropPos, setDropPos] = useState({ top: 0, left: 0, width: 0 });
   const wrapperRef = useRef(null);
+  const accent = themeColor === 'blue' ? '#3b82f6' : '#ef4444';
 
   useEffect(() => { setSearch(value || ''); }, [value]);
 
   useEffect(() => {
+    if (!isOpen) return;
     const handleOut = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setIsOpen(false);
         setSearch(value || '');
       }
     };
-    const handleScroll = () => {
-      if (isOpen) {
-        // update position on scroll
-        if (wrapperRef.current) {
-          const r = wrapperRef.current.getBoundingClientRect();
-          setDropPos({ top: r.bottom + 4, left: r.left, width: r.width });
-        }
-      }
-    };
+    // close on scroll
+    const handleScroll = () => setIsOpen(false);
     document.addEventListener('mousedown', handleOut);
+    document.addEventListener('touchstart', handleOut);
     document.addEventListener('scroll', handleScroll, true);
     return () => {
       document.removeEventListener('mousedown', handleOut);
+      document.removeEventListener('touchstart', handleOut);
       document.removeEventListener('scroll', handleScroll, true);
     };
-  }, [value, isOpen]);
-
-  const openDropdown = () => {
-    if (disabled) return;
-    if (wrapperRef.current) {
-      const r = wrapperRef.current.getBoundingClientRect();
-      setDropPos({ top: r.bottom + 4, left: r.left, width: r.width });
-    }
-    setIsOpen(true);
-  };
+  }, [isOpen, value]);
 
   const filtered = options.filter(o => o.toLowerCase().includes((search||'').toLowerCase()));
-  const accent = themeColor === 'blue' ? '#3b82f6' : '#ef4444';
+
+  // Hitung posisi dropdown langsung dari DOM saat render
+  const getDropStyle = () => {
+    if (!wrapperRef.current) return {};
+    const r = wrapperRef.current.getBoundingClientRect();
+    return {
+      position: 'fixed',
+      top: r.bottom + 6,
+      left: r.left,
+      width: r.width,
+      zIndex: 99999,
+      background: '#fff',
+      border: '1px solid #f3f4f6',
+      borderRadius: 20,
+      boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
+      maxHeight: 220,
+      overflowY: 'auto',
+    };
+  };
+
+  const DropdownPortal = () => {
+    if (!isOpen || disabled) return null;
+    return ReactDOM.createPortal(
+      <ul className="custom-scrollbar py-2" style={getDropStyle()}>
+        {filtered.length > 0 ? filtered.map((opt, i) => (
+          <li
+            key={i}
+            onMouseDown={e => { e.preventDefault(); onChange(opt); setIsOpen(false); }}
+            className="px-4 py-3.5 cursor-pointer text-sm font-semibold text-gray-700 border-b border-gray-50 last:border-0"
+            onMouseEnter={e => e.currentTarget.style.background = themeColor==='blue'?'#eff6ff':'#fef2f2'}
+            onMouseLeave={e => e.currentTarget.style.background = ''}
+          >
+            {opt}
+          </li>
+        )) : (
+          <li className="px-4 py-3.5 text-sm text-gray-400 text-center italic">Tidak ditemukan</li>
+        )}
+      </ul>,
+      document.body
+    );
+  };
 
   return (
     <div ref={wrapperRef}>
@@ -113,58 +142,24 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeCo
         <input
           type="text"
           value={search}
-          onChange={e => { setSearch(e.target.value); if (!isOpen) openDropdown(); }}
-          onFocus={openDropdown}
+          onChange={e => { setSearch(e.target.value); setIsOpen(true); }}
+          onFocus={() => !disabled && setIsOpen(true)}
           placeholder={placeholder}
           disabled={disabled}
-          readOnly={disabled}
           style={{ fontSize: 14, caretColor: accent }}
-          className="w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-4 font-semibold text-gray-800 outline-none transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-400 pr-12 focus:border-current shadow-sm"
+          className="w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-4 font-semibold text-gray-800 outline-none transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-400 pr-12 shadow-sm"
         />
         <div
           className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
           style={{ transition: 'transform 0.25s', transform: isOpen ? 'translateY(-50%) rotate(180deg)' : 'translateY(-50%) rotate(0deg)' }}
-          onClick={() => isOpen ? setIsOpen(false) : openDropdown()}
+          onMouseDown={e => { e.preventDefault(); isOpen ? setIsOpen(false) : setIsOpen(true); }}
         >
           <svg width="18" height="18" fill="none" stroke={disabled ? '#ccc' : accent} strokeWidth="2.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
           </svg>
         </div>
       </div>
-
-      {/* Dropdown pakai position:fixed agar tidak terpotong scroll container */}
-      {isOpen && !disabled && (
-        <ul
-          className="dropdown-enter custom-scrollbar py-2"
-          style={{
-            position: 'fixed',
-            top: dropPos.top,
-            left: dropPos.left,
-            width: dropPos.width,
-            zIndex: 9999,
-            background: '#fff',
-            border: '1px solid #f3f4f6',
-            borderRadius: 20,
-            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-            maxHeight: 220,
-            overflowY: 'auto',
-          }}
-        >
-          {filtered.length > 0 ? filtered.map((opt, i) => (
-            <li
-              key={i}
-              onClick={() => { onChange(opt); setIsOpen(false); }}
-              className="px-4 py-3.5 cursor-pointer text-sm font-semibold text-gray-700 border-b border-gray-50 last:border-0"
-              onMouseEnter={e => e.currentTarget.style.background = themeColor==='blue'?'#eff6ff':'#fef2f2'}
-              onMouseLeave={e => e.currentTarget.style.background = ''}
-            >
-              {opt}
-            </li>
-          )) : (
-            <li className="px-4 py-3.5 text-sm text-gray-400 text-center italic">Tidak ditemukan</li>
-          )}
-        </ul>
-      )}
+      <DropdownPortal />
     </div>
   );
 };
