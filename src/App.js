@@ -63,6 +63,19 @@ const getDriveDirectUrl = (driveUrl) => {
   return driveUrl;
 };
 
+// Parse multi-line photo URL string → array of clean URLs
+// Format: "1. https://...\n2. https://..." atau single URL
+const parsePhotoUrls = (urlString) => {
+  if (!urlString) return [];
+  if (String(urlString).includes('\n')) {
+    return String(urlString)
+      .split('\n')
+      .map(line => line.replace(/^\d+\.\s*/, '').trim())
+      .filter(u => u.startsWith('http'));
+  }
+  return [String(urlString)];
+};
+
 // ─── CUSTOM SELECT (Bottom Sheet style — GoPay/DANA approach) ──────────────────
 const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeColor }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -1045,21 +1058,64 @@ export default function App() {
                     ))}
                   </div>
 
+                  {/* ── Photo Buttons ── */}
                   {(g.mainPhotoUrl || g.defectPhotoUrl) && (
-                    <div className="mt-3 flex gap-2">
-                      {g.mainPhotoUrl && (
-                        <button onClick={() => setPreviewImage({ url: getDriveDirectUrl(g.mainPhotoUrl) })}
-                          className="press-scale flex-1 py-2.5 rounded-xl text-xs font-bold transition-all"
-                          style={{ color: accent, background: accentSoft }}>
+                    <div className="mt-3 space-y-2">
+
+                      {/* Outbound: multi-foto muatan */}
+                      {isOutbound && g.mainPhotoUrl && (() => {
+                        const urls = parsePhotoUrls(g.mainPhotoUrl);
+                        if (urls.length > 1) {
+                          return (
+                            <div>
+                              <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5">📷 Foto Muatan ({urls.length})</p>
+                              <div className="grid grid-cols-3 gap-1.5">
+                                {urls.map((url, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => setPreviewImage({ url: getDriveDirectUrl(url) })}
+                                    className="press-scale py-2 rounded-xl text-xs font-black transition-all"
+                                    style={{ color: accent, background: accentSoft }}
+                                  >
+                                    📷 #{idx + 1}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        }
+                        return (
+                          <button
+                            onClick={() => setPreviewImage({ url: getDriveDirectUrl(urls[0]) })}
+                            className="press-scale w-full py-2.5 rounded-xl text-xs font-bold"
+                            style={{ color: accent, background: accentSoft }}
+                          >
+                            📷 Foto Muatan
+                          </button>
+                        );
+                      })()}
+
+                      {/* Inbound: single foto utama */}
+                      {!isOutbound && g.mainPhotoUrl && (
+                        <button
+                          onClick={() => setPreviewImage({ url: getDriveDirectUrl(g.mainPhotoUrl) })}
+                          className="press-scale w-full py-2.5 rounded-xl text-xs font-bold"
+                          style={{ color: accent, background: accentSoft }}
+                        >
                           📷 Foto Utama
                         </button>
                       )}
+
+                      {/* Segel / Bad Stock */}
                       {g.defectPhotoUrl && (
-                        <button onClick={() => setPreviewImage({ url: getDriveDirectUrl(g.defectPhotoUrl) })}
-                          className="press-scale flex-1 py-2.5 rounded-xl text-xs font-bold bg-orange-50 text-orange-500">
-                          ⚠️ Bad Stock
+                        <button
+                          onClick={() => setPreviewImage({ url: getDriveDirectUrl(g.defectPhotoUrl) })}
+                          className="press-scale w-full py-2.5 rounded-xl text-xs font-bold bg-orange-50 text-orange-500"
+                        >
+                          ⚠️ {isOutbound ? 'Foto Segel' : 'Bad Stock'}
                         </button>
                       )}
+
                     </div>
                   )}
                 </div>
