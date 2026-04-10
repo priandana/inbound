@@ -63,7 +63,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
   const = useState(value);
   const wrapperRef = useRef(null);
 
-  const focusRing = role === 'outbound' ? 'focus:border-blue-500 focus:bg-white' : 'focus:border-red-500 focus:bg-white';
+  const focusRing = role === 'outbound' ? 'focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200' : 'focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-200';
   const iconColor = disabled ? 'text-gray-300' : 'text-gray-400';
   const hoverBg = role === 'outbound' ? 'hover:bg-blue-50' : 'hover:bg-red-50';
 
@@ -94,7 +94,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
           onFocus={() => setIsOpen(true)} 
           placeholder={placeholder} 
           disabled={disabled} 
-          className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all duration-200 ${focusRing} min-h- disabled:bg-gray-100 disabled:text-gray-400 pr-10`} 
+          className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all duration-200 ${focusRing} disabled:bg-gray-100 disabled:text-gray-400 pr-10`} 
         />
         <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
           <svg className={`w-4 h-4 ${iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,18 +146,17 @@ export default function App() {
   const = useState(getTodayDate());
   const = useState('');
   const = useState(''); 
+  const = useState(''); 
+  const = useState(''); 
+  const = useState('');
+  const = useState('');
+  const = useState('');
+  const = useState('');
+  const = useState('');
   const = useState(null);
   const = useState(null);
   
-  const = useState(''); 
-  const = useState(''); 
-  const = useState(''); 
-  const = useState('');
-  const = useState('');
-  const = useState('');
-  const = useState('');
   const = useState([]); 
-  
   const = useState([]);
   const = useState(false);
   const = useState('');
@@ -211,11 +210,7 @@ export default function App() {
   const handleItemSelect = (itemName) => {
     setSelectedItem(itemName);
     const foundItem = ITEMS.find(i => i.item === itemName);
-    if (foundItem) { 
-      setSku(foundItem.sku); 
-    } else { 
-      setSku(''); 
-    }
+    if (foundItem) { setSku(foundItem.sku); } else { setSku(''); }
   };
 
   const triggerCamera = (inputRef) => {
