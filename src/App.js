@@ -63,110 +63,120 @@ const getDriveDirectUrl = (driveUrl) => {
   return driveUrl;
 };
 
-// ─── CUSTOM SELECT ──────────────────────────────────────────────────────────────
-// ─── CUSTOM SELECT ──────────────────────────────────────────────────────────────
+// ─── CUSTOM SELECT (Bottom Sheet style — GoPay/DANA approach) ──────────────────
 const CustomSelect = ({ value, onChange, options, placeholder, disabled, themeColor }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState(value || '');
-  const wrapperRef = useRef(null);
-  const accent = themeColor === 'blue' ? '#3b82f6' : '#ef4444';
+  const [search, setSearch] = useState('');
+  const accent     = themeColor === 'blue' ? '#3b82f6' : '#ef4444';
+  const accentSoft = themeColor === 'blue' ? '#eff6ff' : '#fef2f2';
+  const gradFrom   = themeColor === 'blue' ? '#2563eb' : '#dc2626';
+  const gradTo     = themeColor === 'blue' ? '#1d4ed8' : '#991b1b';
 
-  useEffect(() => { setSearch(value || ''); }, [value]);
+  const filtered = options.filter(o => o.toLowerCase().includes(search.toLowerCase()));
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleOut = (e) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-        setIsOpen(false);
-        setSearch(value || '');
-      }
-    };
-    // close on scroll
-    const handleScroll = () => setIsOpen(false);
-    document.addEventListener('mousedown', handleOut);
-    document.addEventListener('touchstart', handleOut);
-    document.addEventListener('scroll', handleScroll, true);
-    return () => {
-      document.removeEventListener('mousedown', handleOut);
-      document.removeEventListener('touchstart', handleOut);
-      document.removeEventListener('scroll', handleScroll, true);
-    };
-  }, [isOpen, value]);
-
-  const filtered = options.filter(o => o.toLowerCase().includes((search||'').toLowerCase()));
-
-  // Hitung posisi dropdown — otomatis flip ke atas kalau ruang bawah tidak cukup
-  const getDropStyle = () => {
-    if (!wrapperRef.current) return {};
-    const r = wrapperRef.current.getBoundingClientRect();
-    const ITEM_HEIGHT = 52; // approx per item
-    const listH = Math.min(filtered.length * ITEM_HEIGHT + 16, 320);
-    const spaceBelow = window.innerHeight - r.bottom - 8;
-    const spaceAbove = r.top - 8;
-    const flipUp = spaceBelow < listH && spaceAbove > spaceBelow;
-    return {
-      position: 'fixed',
-      top: flipUp ? r.top - listH : r.bottom + 6,
-      left: r.left,
-      width: r.width,
-      zIndex: 99999,
-      background: '#fff',
-      border: '1px solid #f3f4f6',
-      borderRadius: 20,
-      boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
-      maxHeight: Math.min(listH, Math.max(spaceBelow, spaceAbove) - 8),
-      overflowY: 'auto',
-    };
-  };
-
-  const dropStyle = isOpen && !disabled ? getDropStyle() : null;
+  const open  = () => { if (!disabled) { setSearch(''); setIsOpen(true);  } };
+  const close = () => { setIsOpen(false); setSearch(''); };
+  const pick  = (opt) => { onChange(opt); close(); };
 
   return (
-    <div ref={wrapperRef}>
-      {/* Input trigger */}
-      <div className="relative">
-        <input
-          type="text"
-          value={search}
-          onChange={e => { setSearch(e.target.value); setIsOpen(true); }}
-          onFocus={() => !disabled && setIsOpen(true)}
-          placeholder={placeholder}
-          disabled={disabled}
-          style={{ fontSize: 14, caretColor: accent }}
-          className="w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-4 font-semibold text-gray-800 outline-none transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-400 pr-12 shadow-sm"
-        />
-        <div
-          className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
-          style={{ transition: 'transform 0.25s', transform: isOpen ? 'translateY(-50%) rotate(180deg)' : 'translateY(-50%) rotate(0deg)' }}
-          onMouseDown={e => { e.preventDefault(); isOpen ? setIsOpen(false) : setIsOpen(true); }}
-        >
-          <svg width="18" height="18" fill="none" stroke={disabled ? '#ccc' : accent} strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
-          </svg>
-        </div>
-      </div>
+    <>
+      {/* ── Trigger button ── */}
+      <button
+        type="button"
+        onClick={open}
+        disabled={disabled}
+        className="press-scale w-full bg-white border-2 border-gray-100 rounded-2xl px-4 py-4 text-left flex items-center justify-between shadow-sm transition-all"
+        style={{ opacity: disabled ? 0.5 : 1 }}
+      >
+        <span className="font-semibold text-sm" style={{ color: value ? '#1f2937' : '#9ca3af' }}>
+          {value || placeholder}
+        </span>
+        <svg width="18" height="18" fill="none" stroke={accent} strokeWidth="2.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
 
-      {/* Portal: render ke document.body agar tidak terpotong scroll/overflow apapun */}
-      {dropStyle && ReactDOM.createPortal(
-        <ul style={dropStyle}>
-          {filtered.length > 0 ? filtered.map((opt, i) => (
-            <li
-              key={i}
-              onMouseDown={e => { e.preventDefault(); onChange(opt); setIsOpen(false); }}
-              onTouchEnd={e => { e.preventDefault(); onChange(opt); setIsOpen(false); }}
-              style={{ padding: '14px 16px', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#374151', borderBottom: i < filtered.length - 1 ? '1px solid #f9fafb' : 'none' }}
-              onMouseEnter={e => e.currentTarget.style.background = themeColor==='blue'?'#eff6ff':'#fef2f2'}
-              onMouseLeave={e => e.currentTarget.style.background = ''}
-            >
-              {opt}
-            </li>
-          )) : (
-            <li style={{ padding: '14px 16px', fontSize: 13, color: '#9ca3af', textAlign: 'center', fontStyle: 'italic' }}>Tidak ditemukan</li>
-          )}
-        </ul>,
+      {/* ── Bottom Sheet Portal ── */}
+      {isOpen && ReactDOM.createPortal(
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99999, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          {/* Overlay */}
+          <div
+            onClick={close}
+            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+          />
+          {/* Sheet */}
+          <div
+            style={{
+              position: 'relative',
+              background: '#fff',
+              borderRadius: '28px 28px 0 0',
+              maxHeight: '75vh',
+              display: 'flex',
+              flexDirection: 'column',
+              animation: 'slideUp 0.3s cubic-bezier(.22,.68,0,1.2) both',
+            }}
+          >
+            {/* Handle & header */}
+            <div style={{ padding: '16px 20px 12px', flexShrink: 0 }}>
+              <div style={{ width: 40, height: 4, background: '#e5e7eb', borderRadius: 99, margin: '0 auto 16px' }} />
+              <p style={{ fontSize: 16, fontWeight: 900, color: '#111827', marginBottom: 12 }}>{placeholder}</p>
+              {/* Search */}
+              <div style={{ position: 'relative' }}>
+                <input
+                  autoFocus
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Cari..."
+                  style={{
+                    width: '100%', boxSizing: 'border-box', border: '2px solid #f3f4f6',
+                    borderRadius: 16, padding: '12px 12px 12px 44px', fontSize: 14,
+                    fontWeight: 600, outline: 'none', background: '#f9fafb', caretColor: accent,
+                  }}
+                />
+                <svg style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} width="16" height="16" fill="none" stroke="#9ca3af" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8"/><path strokeLinecap="round" d="M21 21l-4.35-4.35"/>
+                </svg>
+              </div>
+            </div>
+
+            {/* List */}
+            <ul style={{ overflowY: 'auto', flex: 1, paddingBottom: 24 }}>
+              {filtered.length > 0 ? filtered.map((opt, i) => (
+                <li
+                  key={i}
+                  onClick={() => pick(opt)}
+                  style={{
+                    padding: '15px 20px',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: opt === value ? accent : '#374151',
+                    background: opt === value ? accentSoft : 'transparent',
+                    borderBottom: '1px solid #f9fafb',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  {opt}
+                  {opt === value && (
+                    <svg width="16" height="16" fill="none" stroke={accent} strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  )}
+                </li>
+              )) : (
+                <li style={{ padding: '20px', textAlign: 'center', color: '#9ca3af', fontSize: 13, fontStyle: 'italic' }}>
+                  Tidak ditemukan
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>,
         document.body
       )}
-    </div>
+    </>
   );
 };
 
