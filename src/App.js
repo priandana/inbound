@@ -67,13 +67,20 @@ const getDriveDirectUrl = (driveUrl) => {
 // Format: "1. https://...\n2. https://..." atau single URL
 const parsePhotoUrls = (urlString) => {
   if (!urlString) return [];
-  if (String(urlString).includes('\n')) {
-    return String(urlString)
-      .split('\n')
+  const str = String(urlString).trim();
+  // Numbered multi-line format — handle both \n and \r\n
+  if (str.includes('\n') || str.includes('\r')) {
+    const lines = str.split(/\r?\n/)
       .map(line => line.replace(/^\d+\.\s*/, '').trim())
-      .filter(u => u.startsWith('http'));
+      .filter(u => u.length > 5); // accept any non-empty URL-like string
+    if (lines.length > 0) return lines;
   }
-  return [String(urlString)];
+  // Old comma-separated format: "url1, url2, url3"
+  if (str.includes(', http')) {
+    return str.split(', ').map(u => u.trim()).filter(u => u.length > 5);
+  }
+  // Single URL
+  return [str];
 };
 
 // ─── CUSTOM SELECT (Bottom Sheet style — GoPay/DANA approach) ──────────────────
