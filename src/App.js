@@ -63,11 +63,13 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
   const = useState(value);
   const wrapperRef = useRef(null);
 
-  const focusRing = role === 'outbound' ? 'focus:border-blue-500 focus:bg-white' : 'focus:border-red-500 focus:bg-white';
+  const focusRing = role === 'outbound' ? 'focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200' : 'focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-200';
   const iconColor = disabled ? 'text-gray-300' : 'text-gray-400';
   const hoverBg = role === 'outbound' ? 'hover:bg-blue-50' : 'hover:bg-red-50';
 
-  useEffect(() => { setSearch(value); },);
+  useEffect(() => { 
+    setSearch(value); 
+  },);
   
   useEffect(() => {
     function handleClickOutside(event) {
@@ -413,8 +415,8 @@ export default function App() {
   // =========================================================
   if (!role) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center font-sans p-4">
-         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 text-center animate-fade-in">
+      <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans p-4 relative">
+         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 text-center animate-fade-in relative z-10">
             <h1 className="text-3xl font-black text-gray-800 mb-2">B-Log App</h1>
             <p className="text-gray-500 text-sm mb-10 font-medium">Pilih modul operasional</p>
             
@@ -438,10 +440,10 @@ export default function App() {
   // =========================================================
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center font-sans md:p-4">
+      <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans md:p-4">
         <div className="w-full max-w-md bg-white md:rounded-3xl shadow-2xl text-center relative overflow-hidden h-screen md:h- flex flex-col animate-fade-in">
           {/* Header Melengkung OVO/DANA Style */}
-          <div className={`w-full h-64 bg-gradient-to-b ${theme.gradient} rounded-b- relative flex flex-col items-center justify-center`}>
+          <div className={`w-full h-64 bg-gradient-to-b ${theme.gradient} rounded-b-3xl relative flex flex-col items-center justify-center`}>
             <button onClick={() => setRole(null)} className="absolute top-6 left-6 text-white/80 hover:text-white z-20 flex items-center gap-1 text-sm font-bold">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg> Batal
             </button>
@@ -490,7 +492,7 @@ export default function App() {
         )}
 
         {/* HEADER DANA/GOPAY STYLE */}
-        <div className={`bg-gradient-to-r ${theme.gradient} px-5 pt-12 pb-6 rounded-b- shadow-md relative z-20 overflow-hidden`}>
+        <div className={`bg-gradient-to-r ${theme.gradient} px-5 pt-12 pb-6 rounded-b-3xl shadow-md relative z-20 overflow-hidden`}>
           <div className="flex justify-between items-center text-white relative z-10">
             <div>
               <p className="text-white/80 text-xs font-bold uppercase tracking-widest mb-0.5">B-Log Operasional</p>
@@ -511,23 +513,23 @@ export default function App() {
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div>
-                    <label className="block text- font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Tanggal</label>
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all appearance-none min-h- ${theme.ring}`}/>
+                    <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Tanggal</label>
+                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all appearance-none min-h- ${theme.ring} focus:bg-white`}/>
                   </div>
                   <div>
-                    <label className="block text- font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Nopol</label>
-                    <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all min-h- ${theme.ring}`}/>
+                    <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Nopol</label>
+                    <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all min-h- ${theme.ring} focus:bg-white`}/>
                   </div>
                 </div>
                 
                 {!isOutbound && (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text- font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Supplier Asal</label>
-                      <input type="text" placeholder="Ketik Nama Vendor..." value={supplier} onChange={(e) => setSupplier(e.target.value.toUpperCase())} disabled={cart.length > 0} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all min-h- ${theme.ring} disabled:bg-gray-100 disabled:opacity-60`}/>
+                      <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Supplier Asal</label>
+                      <input type="text" placeholder="Ketik Nama Vendor..." value={supplier} onChange={(e) => setSupplier(e.target.value.toUpperCase())} disabled={cart.length > 0} className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none uppercase transition-all min-h- ${theme.ring} focus:bg-white disabled:opacity-60`}/>
                     </div>
                     <div>
-                      <label className="block text- font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Customer Origin</label>
+                      <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Customer Origin</label>
                       <CustomSelect role={role} value={selectedCustomer} options={CUSTOMERS} placeholder="Pilih Customer..." disabled={cart.length > 0} onChange={(v) => setSelectedCustomer(v)}/>
                     </div>
                   </div>
@@ -540,34 +542,34 @@ export default function App() {
                   {isOutbound && (
                     <>
                       <div>
-                        <label className={`block text- font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Resto Tujuan</label>
+                        <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Resto Tujuan</label>
                         <input type="text" value={resto} onChange={(e) => setResto(e.target.value)} placeholder="Contoh: Gacoan Dago" className={`w-full bg-white border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold outline-none transition-all min-h- ${theme.ring}`}/>
                       </div>
                       <div>
-                        <label className={`block text- font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Customer</label>
+                        <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Customer</label>
                         <CustomSelect role={role} value={selectedCustomer} options={CUSTOMERS} placeholder="Pilih Prinsipal..." onChange={(v) => setSelectedCustomer(v)}/>
                       </div>
                     </>
                   )}
                   
                   <div>
-                    <label className={`block text- font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Nama Item</label>
+                    <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Nama Item</label>
                     <CustomSelect role={role} value={selectedItem} options={itemOptions} placeholder="Pilih Barang..." disabled={!isOutbound && !selectedCustomer} onChange={(v) => handleItemSelect(v)}/>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className={`block text- font-black ${theme.text} uppercase tracking-wide mb-1.5`}>SKU</label>
+                      <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>SKU</label>
                       <input type="text" value={sku} readOnly className="w-full bg-black/5 border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-mono text-gray-500 outline-none min-h-" />
                     </div>
                     <div>
-                      <label className={`block text- font-black ${theme.text} uppercase tracking-wide mb-1.5`}>QTY (CTN)</label>
+                      <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>QTY (CTN)</label>
                       <input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="0" className={`w-full bg-white border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all min-h- ${theme.ring}`}/>
                     </div>
                   </div>
                   
                   <div>
-                    <label className={`block text- font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Expired Date</label>
+                    <label className={`block text-xs font-black ${theme.text} uppercase tracking-wide mb-1.5`}>Expired Date</label>
                     <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className={`w-full bg-white border-2 border-transparent rounded-xl px-3 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all min-h- appearance-none ${theme.ring}`}/>
                   </div>
                   
@@ -581,7 +583,7 @@ export default function App() {
                     {cart.map((c, i) => (
                       <div key={i} className="flex justify-between items-center bg-gray-50 p-3.5 rounded-xl border border-gray-100">
                         <div className="flex-1">
-                          {isOutbound && <span className={`text- font-black ${theme.text} block uppercase mb-1`}>📍 {c.resto}</span>}
+                          {isOutbound && <span className={`text-xs font-black ${theme.text} block uppercase mb-1`}>📍 {c.resto}</span>}
                           <p className="font-bold text-sm text-gray-800">{c.item}</p>
                           <p className="text-xs text-gray-500 mt-0.5"><span className={`font-black ${theme.text}`}>{c.qty} CTN</span> • Exp: {c.expDate}</p>
                         </div>
@@ -646,9 +648,9 @@ export default function App() {
                 <div key={i} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <span className="text- font-bold text-gray-400 block mb-0.5">{g.timestamp}</span>
+                      <span className="text-xs font-bold text-gray-400 block mb-0.5">{g.timestamp}</span>
                       <h4 className="font-black text-lg text-gray-800">{g.nopol}</h4>
-                      {!isOutbound && g.supplier && <span className="text- bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-bold uppercase mt-1 inline-block">Dari: {g.supplier}</span>}
+                      {!isOutbound && g.supplier && <span className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-bold uppercase mt-1 inline-block">Dari: {g.supplier}</span>}
                     </div>
                     <button onClick={() => handleShareWA(g)} className="bg-green-50 text-green-600 p-2.5 rounded-xl flex items-center justify-center"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>
                   </div>
@@ -657,17 +659,17 @@ export default function App() {
                     {g.items.map((it, idx) => (
                       <div key={idx} className="flex justify-between items-center border-b border-gray-200 last:border-0 py-1.5">
                         <div className="flex flex-col">
-                           {it.resto && <span className={`text- font-black ${theme.text} uppercase`}>📍 {it.resto}</span>}
+                           {it.resto && <span className={`text-xs font-black ${theme.text} uppercase`}>📍 {it.resto}</span>}
                            <span className="text-xs font-bold text-gray-800">{it.item}</span>
                         </div>
-                        <span className={`text- font-black ${theme.text} ${theme.bgSoft} px-2 py-1 rounded`}>{it.qty} CTN</span>
+                        <span className={`text-xs font-black ${theme.text} ${theme.bgSoft} px-2 py-1 rounded`}>{it.qty} CTN</span>
                       </div>
                     ))}
                   </div>
                   
                   <div className="mt-3 flex gap-2">
-                    {g.mainPhotoUrl && <button onClick={() => setPreviewImage({url: getDriveDirectUrl(g.mainPhotoUrl)})} className={`flex-1 ${theme.bgSoft} ${theme.text} text- font-bold py-2 rounded-lg`}>📷 Foto 1</button>}
-                    {g.defectPhotoUrl && <button onClick={() => setPreviewImage({url: getDriveDirectUrl(g.defectPhotoUrl)})} className="flex-1 bg-orange-50 text-orange-600 text- font-bold py-2 rounded-lg">⚠️ Foto 2</button>}
+                    {g.mainPhotoUrl && <button onClick={() => setPreviewImage({url: getDriveDirectUrl(g.mainPhotoUrl)})} className={`flex-1 ${theme.bgSoft} ${theme.text} text-xs font-bold py-2 rounded-lg`}>📷 Foto 1</button>}
+                    {g.defectPhotoUrl && <button onClick={() => setPreviewImage({url: getDriveDirectUrl(g.defectPhotoUrl)})} className="flex-1 bg-orange-50 text-orange-600 text-xs font-bold py-2 rounded-lg">⚠️ Foto 2</button>}
                   </div>
                 </div>
               ))}
@@ -680,11 +682,11 @@ export default function App() {
           <div className="flex justify-around items-center px-2 py-2">
             <button onClick={() => setActiveTab('form')} className={`flex flex-col items-center justify-center w-full py-2 ${activeTab === 'form' ? theme.text : 'text-gray-400'} transition-colors`}>
               <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-              <span className="text- font-bold">Input Data</span>
+              <span className="text-xs font-bold">Input Data</span>
             </button>
             <button onClick={() => setActiveTab('history')} className={`flex flex-col items-center justify-center w-full py-2 ${activeTab === 'history' ? theme.text : 'text-gray-400'} transition-colors`}>
               <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              <span className="text- font-bold">Riwayat</span>
+              <span className="text-xs font-bold">Riwayat</span>
             </button>
           </div>
         </div>
