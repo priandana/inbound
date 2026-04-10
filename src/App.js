@@ -147,16 +147,17 @@ export default function App() {
   const = useState('');
   const = useState(''); 
   const = useState(''); 
+  const = useState(null);
+  const = useState(null);
+  
+  const = useState(''); 
   const = useState(''); 
   const = useState('');
   const = useState('');
   const = useState('');
   const = useState('');
-  const = useState('');
-  const = useState(null);
-  const = useState(null);
-  
   const = useState([]); 
+  
   const = useState([]);
   const = useState(false);
   const = useState('');
@@ -210,7 +211,11 @@ export default function App() {
   const handleItemSelect = (itemName) => {
     setSelectedItem(itemName);
     const foundItem = ITEMS.find(i => i.item === itemName);
-    if (foundItem) { setSku(foundItem.sku); } else { setSku(''); }
+    if (foundItem) { 
+      setSku(foundItem.sku); 
+    } else { 
+      setSku(''); 
+    }
   };
 
   const triggerCamera = (inputRef) => {
