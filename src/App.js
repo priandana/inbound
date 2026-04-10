@@ -63,7 +63,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
   const = useState(value);
   const wrapperRef = useRef(null);
 
-  const focusRing = role === 'outbound' ? 'focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200' : 'focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-200';
+  const focusRing = role === 'outbound' ? 'focus:border-blue-500 focus:bg-white' : 'focus:border-red-500 focus:bg-white';
   const iconColor = disabled ? 'text-gray-300' : 'text-gray-400';
   const hoverBg = role === 'outbound' ? 'hover:bg-blue-50' : 'hover:bg-red-50';
 
@@ -94,7 +94,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
           onFocus={() => setIsOpen(true)} 
           placeholder={placeholder} 
           disabled={disabled} 
-          className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all duration-200 ${focusRing} disabled:bg-gray-100 disabled:text-gray-400 pr-10`} 
+          className={`w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-3.5 text-sm font-bold text-gray-800 outline-none transition-all duration-200 ${focusRing} min-h- disabled:bg-gray-100 disabled:text-gray-400 pr-10`} 
         />
         <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
           <svg className={`w-4 h-4 ${iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,7 +211,11 @@ export default function App() {
   const handleItemSelect = (itemName) => {
     setSelectedItem(itemName);
     const foundItem = ITEMS.find(i => i.item === itemName);
-    if (foundItem) { setSku(foundItem.sku); } else { setSku(''); }
+    if (foundItem) { 
+      setSku(foundItem.sku); 
+    } else { 
+      setSku(''); 
+    }
   };
 
   const triggerCamera = (inputRef) => {
@@ -253,9 +257,12 @@ export default function App() {
         ctx.fillStyle = role === 'outbound' ? '#60a5fa' : '#f87171'; 
         ctx.font = 'bold 22px Arial';
         
-        let titleStr = role === 'outbound' 
-          ? (type === 'main' ? 'FOTO MUAT TRUK' : 'FOTO SEGEL') 
-          : (type === 'main' ? 'FOTO MOBIL KOSONG' : 'FOTO BAD STOCK');
+        let titleStr = '';
+        if (role === 'outbound') {
+          titleStr = type === 'main' ? 'FOTO MUAT TRUK' : 'FOTO SEGEL';
+        } else {
+          titleStr = type === 'main' ? 'FOTO MOBIL KOSONG' : 'FOTO BAD STOCK';
+        }
         
         ctx.fillText(`B-LOG ${role.toUpperCase()} - ${titleStr}`, 20, height - 60);
         
@@ -282,17 +289,22 @@ export default function App() {
   const handleAddToCart = () => {
     if (role === 'outbound') {
       if (!resto || !selectedCustomer || !selectedItem || !qty || !expDate) {
-        showToast('Lengkapi semua data barang!', 'error'); return;
+        showToast('Lengkapi semua data barang!', 'error'); 
+        return;
       }
       setCart();
     } else {
       if (!selectedItem || !qty || !expDate) {
-        showToast('Lengkapi data barang!', 'error'); return;
+        showToast('Lengkapi data barang!', 'error'); 
+        return;
       }
       setCart();
     }
     
-    setSelectedItem(''); setSku(''); setQty(''); setExpDate(''); 
+    setSelectedItem(''); 
+    setSku(''); 
+    setQty(''); 
+    setExpDate(''); 
     showToast('Dimasukkan ke keranjang 🛒', 'success');
   };
 
@@ -315,22 +327,37 @@ export default function App() {
 
     setIsLoading(true);
     const payload = { 
-      type: role, date, nopol, supplier: role === 'inbound' ? supplier : '', 
-      customer: role === 'inbound' ? selectedCustomer : '', keterangan, 
-      mainPhoto, defectPhoto, items: cart 
+      type: role, 
+      date, 
+      nopol, 
+      supplier: role === 'inbound' ? supplier : '', 
+      customer: role === 'inbound' ? selectedCustomer : '', 
+      keterangan, 
+      mainPhoto, 
+      defectPhoto, 
+      items: cart 
     };
 
     try {
       const scriptUrl = 'https://script.google.com/macros/s/AKfycbxeoOK8BxfrT2Guk3GGh70v15IITYZYQCOA4K_ek3c8n3BkQ080z4Buqyp0DT9prNi6Mw/exec';
       const response = await fetch(scriptUrl, { 
-        method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+        method: 'POST', 
+        body: JSON.stringify(payload), 
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
       });
       const result = await response.json();
       
       if (result.status === 'success') {
         showToast(`Truk berhasil diproses! 🚀`, 'success');
-        setDate(getTodayDate()); setNopol(''); setSupplier(''); setSelectedCustomer(''); 
-        setResto(''); setKeterangan(''); setMainPhoto(null); setDefectPhoto(null); setCart([]);
+        setDate(getTodayDate()); 
+        setNopol(''); 
+        setSupplier(''); 
+        setSelectedCustomer(''); 
+        setResto(''); 
+        setKeterangan(''); 
+        setMainPhoto(null); 
+        setDefectPhoto(null); 
+        setCart([]);
       } else { 
         showToast('Gagal: ' + result.message, 'error'); 
       }
@@ -350,15 +377,22 @@ export default function App() {
       const result = await response.json();
       
       if (result.status === 'success') {
-        const grouped = []; const map = new Map();
+        const grouped = []; 
+        const map = new Map();
         
         result.data.forEach(row => {
           const key = row.timestamp + "_" + row.nopol;
           if (!map.has(key)) {
             map.set(key, { 
-              timestamp: row.timestamp, date: row.date, nopol: row.nopol, supplier: row.supplier, 
-              customer: row.customer, keterangan: row.keterangan, mainPhotoUrl: row.mainPhotoUrl, 
-              defectPhotoUrl: row.defectPhotoUrl, items: [] 
+              timestamp: row.timestamp, 
+              date: row.date, 
+              nopol: row.nopol, 
+              supplier: row.supplier, 
+              customer: row.customer, 
+              keterangan: row.keterangan, 
+              mainPhotoUrl: row.mainPhotoUrl, 
+              defectPhotoUrl: row.defectPhotoUrl, 
+              items: [] 
             });
             grouped.push(map.get(key));
           }
@@ -369,29 +403,43 @@ export default function App() {
           }
         });
         setHistoryData(grouped);
-      } else { setHistoryError('Gagal tarik data.'); }
-    } catch (error) { setHistoryError('Sinyal lemah.'); } finally { setIsLoadingHistory(false); }
+      } else { 
+        setHistoryError('Gagal tarik data.'); 
+      }
+    } catch (error) { 
+      setHistoryError('Sinyal lemah.'); 
+    } finally { 
+      setIsLoadingHistory(false); 
+    }
   },);
 
   useEffect(() => { 
-    if (activeTab === 'history' && isAuthenticated) fetchHistory(); 
+    if (activeTab === 'history' && isAuthenticated) {
+      fetchHistory(); 
+    }
   },);
 
   const handleShareWA = (group) => {
     let text = `*${role.toUpperCase()} REPORT - B-LOG*\n\n*Waktu:* ${group.timestamp}\n*Nopol:* ${group.nopol}\n`;
     if (role === 'inbound') {
       text += `*Supplier Asal:* ${group.supplier || '-'}\n*Customer Origin:* ${group.customer}\n\n*DAFTAR BARANG MASUK:*\n`;
-      group.items.forEach((it, idx) => { text += `${idx + 1}. ${it.item} - *${it.qty} CTN*\n`; });
+      group.items.forEach((it, idx) => { 
+        text += `${idx + 1}. ${it.item} - *${it.qty} CTN*\n`; 
+      });
     } else {
       text += `\n*PENGIRIMAN MULTI-DROP:*\n`;
       const restoMap = {};
       group.items.forEach(it => { 
-        if(!restoMap) restoMap = []; 
+        if(!restoMap) {
+          restoMap = []; 
+        }
         restoMap.push(it); 
       });
       Object.keys(restoMap).forEach(restoName => {
         text += `\n📍 *${restoName}*\n`;
-        restoMap.forEach(it => { text += `- ${it.item} (*${it.qty} CTN*)\n`; });
+        restoMap.forEach(it => { 
+          text += `- ${it.item} (*${it.qty} CTN*)\n`; 
+        });
       });
     }
     text += `\n*Ket:* ${group.keterangan || '-'}\n\n*Foto Utama:* ${group.mainPhotoUrl ? getDriveDirectUrl(group.mainPhotoUrl) : '-'}\n*Foto Pendukung:* ${group.defectPhotoUrl ? getDriveDirectUrl(group.defectPhotoUrl) : '-'}`;
@@ -400,8 +448,11 @@ export default function App() {
 
   const filteredHistoryData = historyData.filter(group => {
     const term = searchHistory.toLowerCase();
-    if (role === 'inbound') return group.nopol.toLowerCase().includes(term) || group.customer.toLowerCase().includes(term) || (group.supplier && group.supplier.toLowerCase().includes(term));
-    return group.nopol.toLowerCase().includes(term) || group.items.some(it => it.resto && it.resto.toLowerCase().includes(term)) || (group.customer && group.customer.toLowerCase().includes(term));
+    if (role === 'inbound') {
+      return group.nopol.toLowerCase().includes(term) || group.customer.toLowerCase().includes(term) || (group.supplier && group.supplier.toLowerCase().includes(term));
+    } else {
+      return group.nopol.toLowerCase().includes(term) || group.items.some(it => it.resto && it.resto.toLowerCase().includes(term)) || (group.customer && group.customer.toLowerCase().includes(term));
+    }
   });
 
   // TEMA DINAMIS SUPER APP
@@ -415,8 +466,8 @@ export default function App() {
   // =========================================================
   if (!role) {
     return (
-      <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans p-4 relative">
-         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 text-center animate-fade-in relative z-10">
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center font-sans p-4">
+         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 text-center animate-fade-in">
             <h1 className="text-3xl font-black text-gray-800 mb-2">B-Log App</h1>
             <p className="text-gray-500 text-sm mb-10 font-medium">Pilih modul operasional</p>
             
@@ -440,7 +491,7 @@ export default function App() {
   // =========================================================
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans md:p-4">
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center font-sans md:p-4">
         <div className="w-full max-w-md bg-white md:rounded-3xl shadow-2xl text-center relative overflow-hidden h-screen md:h- flex flex-col animate-fade-in">
           {/* Header Melengkung OVO/DANA Style */}
           <div className={`w-full h-64 bg-gradient-to-b ${theme.gradient} rounded-b-3xl relative flex flex-col items-center justify-center`}>
