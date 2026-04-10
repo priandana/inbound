@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './index.css'; 
 
 // --- DATA MASTER ASLI ---
-const CUSTOMERS =;
+const CUSTOMERS = ["DIKICHI BANDUNG FRESH", "GACOAN BANDUNG FRESH", "BENFARM BANDUNG FRESH"];
 const ITEMS = [
   { customer: "DIKICHI BANDUNG FRESH", item: "BEEF PATTY DKC 70 G", sku: "110193" },
   { customer: "DIKICHI BANDUNG FRESH", item: "BONELESS PAHA DKC 70 G REG", sku: "110206" },
@@ -52,14 +52,14 @@ const getTodayDate = () => {
 const getDriveDirectUrl = (driveUrl) => {
   if (!driveUrl) return '';
   const match = driveUrl.match(/\/d\/(.+?)\//);
-  if (match && match) return `https://drive.google.com/thumbnail?id=${match}&sz=w1000`;
+  if (match && match[1]) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
   return driveUrl; 
 };
 
 // --- KOMPONEN DROPDOWN CUSTOM ---
 const CustomSelect = ({ value, onChange, options, placeholder, disabled, role }) => {
-  const = useState(false);
-  const = useState(value);
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState(value);
   const wrapperRef = useRef(null);
 
   const focusColor = role === 'outbound' ? 'focus:ring-blue-400 focus:border-blue-400' : 'focus:ring-red-400 focus:border-red-400';
@@ -67,7 +67,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
   const iconColor = disabled ? 'text-gray-300' : (role === 'outbound' ? 'text-blue-400' : 'text-red-400');
   const hoverColor = role === 'outbound' ? 'hover:bg-blue-50' : 'hover:bg-red-50';
 
-  useEffect(() => { setSearch(value); },);
+  useEffect(() => { setSearch(value); }, [value]);
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -77,7 +77,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  },);
+  }, [value]);
 
   const filtered = options.filter(opt => opt.toLowerCase().includes(search.toLowerCase()));
 
@@ -91,7 +91,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
           onFocus={() => setIsOpen(true)} 
           placeholder={placeholder} 
           disabled={disabled} 
-          className={`w-full ${bgColor} rounded-xl px-4 py-3 text-sm font-medium text-gray-800 outline-none border-2 transition-all duration-300 ${focusColor} min-h- disabled:bg-gray-100 disabled:border-gray-200 disabled:text-gray-400 pr-10 hover:shadow-md`} 
+          className={`w-full ${bgColor} rounded-xl px-4 py-3 text-sm font-medium text-gray-800 outline-none border-2 transition-all duration-300 ${focusColor} min-h-[50px] disabled:bg-gray-100 disabled:border-gray-200 disabled:text-gray-400 pr-10 hover:shadow-md`} 
         />
         <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
           <svg className={`w-5 h-5 ${iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +101,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled, role })
       </div>
       
       {isOpen && !disabled && (
-        <ul className="absolute z-50 w-full bg-white border border-gray-100 rounded-xl shadow-2xl max-h-56 overflow-y-auto mt-2 top-full custom-scrollbar py-1 animate-fade-in origin-top">
+        <ul className="absolute z-50 w-full bg-white border border-gray-100 rounded-xl shadow-2xl max-h-56 overflow-y-auto mt-2 top-full custom-scrollbar py-1 origin-top transition-all duration-300">
           {filtered.length > 0 ? filtered.map((opt, idx) => (
             <li 
               key={idx} 
@@ -123,7 +123,7 @@ export default function App() {
   
   // ANTI-ZOOM iOS SAFARI
   useEffect(() => {
-    let meta = document.querySelector("meta");
+    let meta = document.querySelector("meta[name='viewport']");
     if (!meta) {
       meta = document.createElement('meta');
       meta.name = 'viewport';
@@ -132,35 +132,35 @@ export default function App() {
     meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
   }, []);
 
-  const = useState(null); 
-  const = useState(false);
-  const = useState('');
-  const = useState(false);
-  const = useState('form'); 
-  const = useState(false);
-  const = useState(false);
-  const = useState(null); 
+  const [role, setRole] = useState(null); 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState(false);
+  const [activeTab, setActiveTab] = useState('form'); 
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState(null); 
 
-  const = useState(getTodayDate());
-  const = useState('');
-  const = useState(''); 
-  const = useState(null);
-  const = useState(null);
+  const [date, setDate] = useState(getTodayDate());
+  const [nopol, setNopol] = useState('');
+  const [keterangan, setKeterangan] = useState(''); 
+  const [mainPhoto, setMainPhoto] = useState(null);
+  const [defectPhoto, setDefectPhoto] = useState(null);
   
-  const = useState(''); 
-  const = useState(''); 
-  const = useState(''); 
-  const = useState('');
-  const = useState('');
-  const = useState('');
-  const = useState('');
-  const = useState([]); 
+  const [supplier, setSupplier] = useState(''); 
+  const [selectedCustomer, setSelectedCustomer] = useState(''); 
+  const [resto, setResto] = useState(''); 
+  const [selectedItem, setSelectedItem] = useState('');
+  const [sku, setSku] = useState('');
+  const [qty, setQty] = useState('');
+  const [expDate, setExpDate] = useState('');
+  const [cart, setCart] = useState([]); 
   
-  const = useState([]);
-  const = useState(false);
-  const = useState('');
-  const = useState('');
-  const = useState(null); 
+  const [historyData, setHistoryData] = useState([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [historyError, setHistoryError] = useState('');
+  const [searchHistory, setSearchHistory] = useState('');
+  const [previewImage, setPreviewImage] = useState(null); 
 
   const mainPhotoInputRef = useRef(null);
   const defectPhotoInputRef = useRef(null);
@@ -221,7 +221,7 @@ export default function App() {
   };
 
   const handlePhotoCapture = (e, type) => {
-    const file = e.target.files;
+    const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
@@ -282,12 +282,12 @@ export default function App() {
       if (!resto || !selectedCustomer || !selectedItem || !qty || !expDate) {
         showToast('Lengkapi semua field barang!', 'error'); return;
       }
-      setCart();
+      setCart([...cart, { resto, customer: selectedCustomer, item: selectedItem, sku, qty, expDate }]);
     } else {
       if (!selectedItem || !qty || !expDate) {
         showToast('Lengkapi data barang!', 'error'); return;
       }
-      setCart();
+      setCart([...cart, { item: selectedItem, sku, qty, expDate }]);
     }
     
     setSelectedItem(''); setSku(''); setQty(''); setExpDate(''); 
@@ -295,7 +295,7 @@ export default function App() {
   };
 
   const handleRemoveFromCart = (index) => {
-    const newCart =; 
+    const newCart = [...cart]; 
     newCart.splice(index, 1); 
     setCart(newCart);
   };
@@ -370,11 +370,11 @@ export default function App() {
       } else { setHistoryError('Gagal ambil data dari server.'); }
     } catch (error) { setHistoryError('Gagal memuat. Periksa koneksi internet Anda.'); 
     } finally { setIsLoadingHistory(false); }
-  },);
+  }, [role]);
 
   useEffect(() => { 
     if (activeTab === 'history' && isAuthenticated) fetchHistory(); 
-  },);
+  }, [activeTab, isAuthenticated, fetchHistory]);
 
   const handleShareWA = (group) => {
     let text = `*${role.toUpperCase()} REPORT - B-LOG*\n\n*Waktu:* ${group.timestamp}\n*Nopol:* ${group.nopol}\n`;
@@ -386,11 +386,11 @@ export default function App() {
       text += `\n*PENGIRIMAN MULTI-DROP:*\n`;
       const restoMap = {};
       group.items.forEach(it => { 
-        if(!restoMap) restoMap = []; restoMap.push(it); 
+        if(!restoMap[it.resto]) restoMap[it.resto] = []; restoMap[it.resto].push(it); 
       });
       Object.keys(restoMap).forEach(restoName => {
         text += `\n📍 *${restoName}*\n`;
-        restoMap.forEach(it => { text += `- ${it.item} (*${it.qty} CTN*)\n`; });
+        restoMap[restoName].forEach(it => { text += `- ${it.item} (*${it.qty} CTN*)\n`; });
       });
     }
     text += `\n*Ket:* ${group.keterangan || '-'}\n\n*Foto Utama:* ${group.mainPhotoUrl ? getDriveDirectUrl(group.mainPhotoUrl) : '-'}\n*Foto Pendukung:* ${group.defectPhotoUrl ? getDriveDirectUrl(group.defectPhotoUrl) : '-'}`;
@@ -413,17 +413,17 @@ export default function App() {
     return (
       <div className="min-h-screen flex justify-center items-center font-sans p-4 relative overflow-hidden bg-gray-50">
          {/* Latar Belakang Animasi Gelembung Abstrak */}
-         <div className="absolute top- left- w-96 h-96 bg-red-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
-         <div className="absolute bottom- right- w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse" style={{ animationDelay: '2s' }}></div>
+         <div className="absolute top-0 left-0 w-96 h-96 bg-red-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
+         <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse" style={{ animationDelay: '2s' }}></div>
 
-         <div className="w-full max-w-md bg-white/80 backdrop-blur-2xl rounded- shadow-2xl border border-white p-8 text-center relative z-10 transform transition-all duration-500 hover:shadow-">
+         <div className="w-full max-w-md bg-white/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white p-8 text-center relative z-10 transform transition-all duration-500 hover:shadow-lg">
             <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-500 mb-2 tracking-tight">B-Log Portal</h1>
             <p className="text-gray-500 mb-10 font-medium">Pilih modul operasional Anda</p>
             
             <div className="space-y-5">
                <button 
                 onClick={() => setRole('inbound')} 
-                className="w-full relative overflow-hidden bg-white border-2 border-red-100 hover:border-red-400 p-6 rounded-3xl transition-all duration-300 hover:shadow- hover:-translate-y-1 group"
+                className="w-full relative overflow-hidden bg-white border-2 border-red-100 hover:border-red-400 p-6 rounded-3xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group"
                >
                  <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-white to-red-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                  <div className="relative z-10 flex flex-col items-center gap-3">
@@ -434,7 +434,7 @@ export default function App() {
                
                <button 
                 onClick={() => setRole('outbound')} 
-                className="w-full relative overflow-hidden bg-white border-2 border-blue-100 hover:border-blue-400 p-6 rounded-3xl transition-all duration-300 hover:shadow- hover:-translate-y-1 group"
+                className="w-full relative overflow-hidden bg-white border-2 border-blue-100 hover:border-blue-400 p-6 rounded-3xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group"
                >
                  <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-white to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                  <div className="relative z-10 flex flex-col items-center gap-3">
@@ -459,9 +459,9 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50 flex justify-center items-center font-sans text-gray-800 md:p-4">
-        <div className="w-full max-w-md bg-white md:rounded- shadow-2xl p-8 text-center relative overflow-hidden h-screen md:h- flex flex-col justify-center animate-fade-in">
+        <div className="w-full max-w-md bg-white md:rounded-3xl shadow-2xl p-8 text-center relative overflow-hidden h-screen md:h-[800px] flex flex-col justify-center transition-all duration-500">
           {/* Latar Belakang Header Login */}
-          <div className={`absolute top-0 left-0 w-full h-48 bg-gradient-to-br ${theme.bgGradient} rounded-b- shadow-inner`}></div>
+          <div className={`absolute top-0 left-0 w-full h-48 bg-gradient-to-br ${theme.bgGradient} rounded-b-3xl shadow-inner`}></div>
           <button onClick={() => setRole(null)} className="absolute top-6 left-6 text-white/80 hover:text-white z-20 flex items-center gap-1 text-sm font-bold transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg> Batal
           </button>
@@ -478,17 +478,17 @@ export default function App() {
             <div>
               <input 
                 type="password" 
-                pattern="*" 
+                pattern="[0-9]*" 
                 inputMode="numeric" 
                 value={pinInput} 
                 onChange={(e) => setPinInput(e.target.value)} 
-                className={`w-full text-center tracking- font-bold text-3xl py-4 rounded-2xl border-2 focus:outline-none transition-all duration-300 ${pinError ? 'bg-red-50 border-red-400 text-red-600 animate-bounce' : `bg-gray-50 border-gray-100 ${theme.ringFocus}`}`} 
+                className={`w-full text-center tracking-[0.5em] font-bold text-3xl py-4 rounded-2xl border-2 focus:outline-none transition-all duration-300 ${pinError ? 'bg-red-50 border-red-400 text-red-600 animate-pulse' : `bg-gray-50 border-gray-100 ${theme.ringFocus}`}`} 
                 placeholder="••••" 
                 maxLength={4}
               />
-              {pinError && <p className="text-red-500 text-xs font-bold mt-3 animate-fade-in">PIN tidak valid, silakan coba lagi!</p>}
+              {pinError && <p className="text-red-500 text-xs font-bold mt-3">PIN tidak valid, silakan coba lagi!</p>}
             </div>
-            <button type="submit" className={`w-full ${theme.bgMain} ${theme.hoverBg} text-white font-black text-lg py-4 rounded-2xl shadow-xl ${theme.shadow} active:scale- transition-all duration-300 hover:-translate-y-1`}>
+            <button type="submit" className={`w-full ${theme.bgMain} ${theme.hoverBg} text-white font-black text-lg py-4 rounded-2xl shadow-xl ${theme.shadow} active:scale-95 transition-all duration-300 hover:-translate-y-1`}>
               Buka Kunci
             </button>
           </form>
@@ -502,11 +502,11 @@ export default function App() {
   // =========================================================================
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans text-gray-800 md:p-4 relative">
-      <div className="w-full max-w-md bg-gray-50 md:rounded- shadow-2xl overflow-hidden relative h-screen md:h- flex flex-col animate-fade-in">
+      <div className="w-full max-w-md bg-gray-50 md:rounded-3xl shadow-2xl overflow-hidden relative h-screen md:h-[800px] flex flex-col transition-all duration-500">
         
         {/* TOAST NOTIFICATION */}
         {toast && (
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 w- max-w-sm z- animate-fade-in">
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 w-11/12 max-w-sm z-[100]">
             <div className={`p-4 rounded-2xl shadow-2xl flex items-center gap-3 text-white ${toast.type === 'success' ? 'bg-gray-900 border border-gray-700' : 'bg-red-600'}`}>
               <p className="text-sm font-bold tracking-wide">{toast.msg}</p>
             </div>
@@ -514,10 +514,10 @@ export default function App() {
         )}
 
         {/* HEADER APLIKASI */}
-        <div className={`bg-gradient-to-br ${theme.bgGradient} px-6 pt-10 pb-8 rounded-b- shadow-lg relative z-20 flex-shrink-0 transition-colors duration-500`}>
+        <div className={`bg-gradient-to-br ${theme.bgGradient} px-6 pt-10 pb-8 rounded-b-3xl shadow-lg relative z-20 flex-shrink-0 transition-colors duration-500`}>
           <div className="flex justify-between items-center text-white">
             <div>
-              <p className="text-white/80 text- font-bold uppercase tracking-widest mb-1 shadow-sm">B-Log Operasional</p>
+              <p className="text-white/80 text-xs font-bold uppercase tracking-widest mb-1 shadow-sm">B-Log Operasional</p>
               <h1 className="text-3xl font-black drop-shadow-md">{theme.title}</h1>
             </div>
             <button onClick={() => setShowLogoutConfirm(true)} className="w-12 h-12 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl flex items-center justify-center transition-all duration-300 border border-white/20 hover:shadow-lg hover:scale-105">
@@ -531,17 +531,17 @@ export default function App() {
           
           {/* TAB FORM INPUT */}
           {activeTab === 'form' ? (
-            <form onSubmit={handleSubmit} className="space-y-5 animate-fade-in-up">
+            <form onSubmit={handleSubmit} className="space-y-5">
               
               {/* BOX UTAMA (INFO TRUK & SUPPLIER) */}
-              <div className={`bg-white rounded- p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
+              <div className={`bg-white rounded-2xl p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text- font-bold text-gray-400 mb-1 uppercase tracking-wider">Tanggal</label>
+                    <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Tanggal</label>
                     <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={`w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-3 py-3 text-sm font-bold text-gray-700 outline-none transition-colors ${theme.ringFocus}`}/>
                   </div>
                   <div>
-                    <label className="block text- font-bold text-gray-400 mb-1 uppercase tracking-wider">Nopol</label>
+                    <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Nopol</label>
                     <input type="text" placeholder="D 1234 ABC" value={nopol} onChange={(e) => setNopol(e.target.value.toUpperCase())} className={`w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-3 py-3 text-sm font-bold text-gray-700 outline-none uppercase transition-colors ${theme.ringFocus}`}/>
                   </div>
                 </div>
@@ -549,7 +549,7 @@ export default function App() {
                 {!isOutbound && (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text- font-bold text-gray-400 mb-1 uppercase tracking-wider">Supplier Asal</label>
+                      <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Supplier Asal</label>
                       <input 
                         type="text" 
                         placeholder="Ketik Nama Vendor..." 
@@ -560,7 +560,7 @@ export default function App() {
                       />
                     </div>
                     <div>
-                      <label className="block text- font-bold text-gray-400 mb-1 uppercase tracking-wider">Customer Origin</label>
+                      <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Customer Origin</label>
                       <CustomSelect role={role} value={selectedCustomer} options={CUSTOMERS} placeholder="Pilih Customer..." disabled={cart.length > 0} onChange={(v) => setSelectedCustomer(v)}/>
                     </div>
                   </div>
@@ -568,44 +568,44 @@ export default function App() {
               </div>
 
               {/* BOX KERANJANG BARANG */}
-              <div className={`bg-white rounded- p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
+              <div className={`bg-white rounded-2xl p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
                 
-                <div className={`space-y-4 p-5 border-2 border-dashed ${theme.borderLight} rounded- ${theme.bgLight} transition-colors`}>
+                <div className={`space-y-4 p-5 border-2 border-dashed ${theme.borderLight} rounded-2xl ${theme.bgLight} transition-colors`}>
                   {isOutbound && (
                     <>
                       <div>
-                        <label className={`block text- font-black ${theme.textMain} uppercase tracking-wider mb-1`}>Resto Tujuan</label>
+                        <label className={`block text-xs font-black ${theme.textMain} uppercase tracking-wider mb-1`}>Resto Tujuan</label>
                         <input type="text" value={resto} onChange={(e) => setResto(e.target.value)} placeholder="Contoh: Gacoan Dago" className={`w-full bg-white border-2 border-gray-100 rounded-xl px-4 py-3 text-sm font-bold outline-none transition-colors ${theme.ringFocus}`}/>
                       </div>
                       <div>
-                        <label className={`block text- font-black ${theme.textMain} uppercase tracking-wider mb-1`}>Customer</label>
+                        <label className={`block text-xs font-black ${theme.textMain} uppercase tracking-wider mb-1`}>Customer</label>
                         <CustomSelect role={role} value={selectedCustomer} options={CUSTOMERS} placeholder="Pilih Prinsipal..." onChange={(v) => setSelectedCustomer(v)}/>
                       </div>
                     </>
                   )}
                   
                   <div>
-                    <label className={`block text- font-black ${theme.textMain} uppercase tracking-wider mb-1`}>Nama Item</label>
+                    <label className={`block text-xs font-black ${theme.textMain} uppercase tracking-wider mb-1`}>Nama Item</label>
                     <CustomSelect role={role} value={selectedItem} options={itemOptions} placeholder="Pilih Barang..." disabled={!isOutbound && !selectedCustomer} onChange={(v) => handleItemSelect(v)}/>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className={`block text- font-black ${theme.textMain} uppercase tracking-wider mb-1`}>SKU</label>
+                      <label className={`block text-xs font-black ${theme.textMain} uppercase tracking-wider mb-1`}>SKU</label>
                       <input type="text" value={sku} readOnly className="w-full bg-gray-100 border-2 border-transparent rounded-xl px-3 py-3 text-sm font-mono text-gray-500 outline-none" />
                     </div>
                     <div>
-                      <label className={`block text- font-black ${theme.textMain} uppercase tracking-wider mb-1`}>QTY (CTN)</label>
+                      <label className={`block text-xs font-black ${theme.textMain} uppercase tracking-wider mb-1`}>QTY (CTN)</label>
                       <input type="number" value={qty} onChange={(e) => setQty(e.target.value)} placeholder="0" className={`w-full bg-white border-2 border-gray-100 rounded-xl px-3 py-3 text-sm font-bold text-gray-800 outline-none transition-colors ${theme.ringFocus}`}/>
                     </div>
                   </div>
                   
                   <div>
-                    <label className={`block text- font-black ${theme.textMain} uppercase tracking-wider mb-1`}>Expired Date</label>
+                    <label className={`block text-xs font-black ${theme.textMain} uppercase tracking-wider mb-1`}>Expired Date</label>
                     <input type="date" value={expDate} onChange={(e) => setExpDate(e.target.value)} className={`w-full bg-white border-2 border-gray-100 rounded-xl px-3 py-3 text-sm font-bold text-gray-800 outline-none transition-colors ${theme.ringFocus}`}/>
                   </div>
                   
-                  <button type="button" onClick={handleAddToCart} className={`w-full mt-2 bg-white border-2 ${theme.borderMain} ${theme.textMain} hover:bg-white hover:text-white hover:bg-opacity-0 hover:${theme.bgMain} font-black text-sm py-3.5 rounded-xl transition-all duration-300 active:scale-95 shadow-sm`}>
+                  <button type="button" onClick={handleAddToCart} className={`w-full mt-2 bg-white border-2 ${theme.borderMain} ${theme.textMain} hover:bg-opacity-0 hover:${theme.bgMain} font-black text-sm py-3.5 rounded-xl transition-all duration-300 active:scale-95 shadow-sm`}>
                     + Tambah Ke Keranjang
                   </button>
                 </div>
@@ -614,9 +614,9 @@ export default function App() {
                 {cart.length > 0 && (
                   <div className="mt-5 space-y-3">
                     {cart.map((c, i) => (
-                      <div key={i} className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm animate-fade-in-up hover:border-gray-300 transition-colors">
+                      <div key={i} className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-sm hover:border-gray-300 transition-colors">
                         <div className="flex-1">
-                          {isOutbound && <span className={`text- font-black ${theme.textMain} block uppercase tracking-wider mb-1`}>📍 {c.resto}</span>}
+                          {isOutbound && <span className={`text-xs font-black ${theme.textMain} block uppercase tracking-wider mb-1`}>📍 {c.resto}</span>}
                           <p className="font-bold text-sm text-gray-800">{c.item}</p>
                           <p className="text-xs text-gray-500 mt-1 font-medium"><span className={`font-black ${theme.textMain}`}>{c.qty} CTN</span> • Exp: {c.expDate}</p>
                         </div>
@@ -630,7 +630,7 @@ export default function App() {
               </div>
 
               {/* BOX FOTO */}
-              <div className={`bg-white rounded- p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
+              <div className={`bg-white rounded-2xl p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
                 <h3 className="font-bold text-sm text-gray-800 mb-3">{isOutbound ? 'Foto Muatan Penuh' : 'Foto Mobil Kosong'} <span className="text-red-500">*</span></h3>
                 {mainPhoto ? (
                   <div className="relative group rounded-xl overflow-hidden shadow-sm">
@@ -646,7 +646,7 @@ export default function App() {
                 <input type="file" accept="image/*" capture="environment" ref={mainPhotoInputRef} onChange={(e) => handlePhotoCapture(e, 'main')} className="hidden" />
               </div>
 
-              <div className={`bg-white rounded- p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
+              <div className={`bg-white rounded-2xl p-5 shadow-sm border ${theme.borderLight} transition-all duration-300 hover:shadow-md`}>
                 <h3 className="font-bold text-sm text-gray-800 mb-3">{isOutbound ? 'Foto Segel Pintu (Opsional)' : 'Foto Bad Stock (Opsional)'}</h3>
                 {defectPhoto ? (
                   <div className="relative group rounded-xl overflow-hidden shadow-sm">
@@ -662,7 +662,7 @@ export default function App() {
               </div>
 
               {/* TOMBOL SUBMIT */}
-              <button type="submit" disabled={isLoading} className={`w-full ${theme.bgMain} ${theme.hoverBg} text-white font-black text-lg py-5 rounded-2xl shadow-xl ${theme.shadow} active:scale- transition-all duration-300 hover:-translate-y-1`}>
+              <button type="submit" disabled={isLoading} className={`w-full ${theme.bgMain} ${theme.hoverBg} text-white font-black text-lg py-5 rounded-2xl shadow-xl ${theme.shadow} active:scale-95 transition-all duration-300 hover:-translate-y-1`}>
                 {isLoading ? 'Sedang Memproses...' : `Kirim Data (${cart.length} Item)`}
               </button>
             </form>
@@ -670,7 +670,7 @@ export default function App() {
           ) : (
 
             /* TAB HISTORY AESTHETIC */
-            <div className="space-y-5 animate-fade-in-up">
+            <div className="space-y-5">
               <div className="relative shadow-sm rounded-xl overflow-hidden">
                 <input 
                   type="text" 
@@ -691,15 +691,15 @@ export default function App() {
                 </div>
               ) : (
                 filteredHistoryData.map((g, i) => (
-                  <div key={i} className={`bg-white p-5 rounded- shadow-sm border ${theme.borderLight} relative overflow-hidden transition-all hover:shadow-md`}>
+                  <div key={i} className={`bg-white p-5 rounded-2xl shadow-sm border ${theme.borderLight} relative overflow-hidden transition-all hover:shadow-md`}>
                     <div className={`absolute top-0 left-0 w-1.5 h-full ${theme.bgMain}`}></div>
                     
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <span className="text- font-black text-gray-400 block tracking-widest">{g.timestamp}</span>
+                        <span className="text-xs font-black text-gray-400 block tracking-widest">{g.timestamp}</span>
                         <h4 className="font-black text-xl text-gray-800 mt-1 tracking-tight">{g.nopol}</h4>
                         {!isOutbound && g.supplier && (
-                          <span className={`inline-block mt-2 px-2 py-1 bg-gray-100 text-gray-600 text- font-bold rounded-md uppercase tracking-wider border border-gray-200`}>Dari: {g.supplier}</span>
+                          <span className={`inline-block mt-2 px-2 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-md uppercase tracking-wider border border-gray-200`}>Dari: {g.supplier}</span>
                         )}
                       </div>
                       <button onClick={() => handleShareWA(g)} className="bg-green-50 text-green-600 hover:bg-green-500 hover:text-white p-2.5 rounded-xl transition-colors shadow-sm border border-green-100 flex items-center justify-center">
@@ -711,10 +711,10 @@ export default function App() {
                       {g.items.map((it, idx) => (
                         <div key={idx} className="flex justify-between items-center border-b border-gray-200 last:border-0 py-2.5">
                           <div className="flex flex-col">
-                             {it.resto && <span className={`text- font-black ${theme.textMain} uppercase tracking-wider`}>📍 {it.resto}</span>}
+                             {it.resto && <span className={`text-xs font-black ${theme.textMain} uppercase tracking-wider`}>📍 {it.resto}</span>}
                              <span className="text-xs font-bold text-gray-800">{it.item}</span>
                           </div>
-                          <span className={`text- font-black ${theme.textMain} ${theme.bgLight} px-2.5 py-1 rounded-md border ${theme.borderLight}`}>{it.qty} CTN</span>
+                          <span className={`text-xs font-black ${theme.textMain} ${theme.bgLight} px-2.5 py-1 rounded-md border ${theme.borderLight}`}>{it.qty} CTN</span>
                         </div>
                       ))}
                     </div>
@@ -739,12 +739,12 @@ export default function App() {
         </div>
 
         {/* BOTTOM NAVIGATION FIXED */}
-        <div className="absolute bottom-6 left-6 right-6 z-40 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-          <div className="bg-white/90 backdrop-blur-xl p-2 rounded-2xl shadow- flex border border-white/50">
-            <button onClick={() => setActiveTab('form')} className={`flex-1 py-3 font-black text-xs rounded-xl transition-all duration-300 ${activeTab === 'form' ? `${theme.bgMain} text-white shadow-md transform scale-` : 'text-gray-400 hover:bg-gray-50'}`}>
+        <div className="absolute bottom-6 left-6 right-6 z-40">
+          <div className="bg-white/90 backdrop-blur-xl p-2 rounded-2xl shadow-lg flex border border-white/50">
+            <button onClick={() => setActiveTab('form')} className={`flex-1 py-3 font-black text-xs rounded-xl transition-all duration-300 ${activeTab === 'form' ? `${theme.bgMain} text-white shadow-md transform scale-105` : 'text-gray-400 hover:bg-gray-50'}`}>
               📝 Form Input
             </button>
-            <button onClick={() => setActiveTab('history')} className={`flex-1 py-3 font-black text-xs rounded-xl transition-all duration-300 ${activeTab === 'history' ? `${theme.bgMain} text-white shadow-md transform scale-` : 'text-gray-400 hover:bg-gray-50'}`}>
+            <button onClick={() => setActiveTab('history')} className={`flex-1 py-3 font-black text-xs rounded-xl transition-all duration-300 ${activeTab === 'history' ? `${theme.bgMain} text-white shadow-md transform scale-105` : 'text-gray-400 hover:bg-gray-50'}`}>
               🕒 Riwayat
             </button>
           </div>
@@ -752,8 +752,8 @@ export default function App() {
 
         {/* MODAL LOGOUT */}
         {showLogoutConfirm && (
-          <div className="absolute inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
-            <div className="bg-white rounded- p-8 shadow-2xl w-full max-w- text-center transform scale-100 transition-transform">
+          <div className="absolute inset-0 z-50 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-6">
+            <div className="bg-white rounded-3xl p-8 shadow-2xl w-full max-w-sm text-center transform scale-100 transition-transform">
               <div className={`w-16 h-16 ${theme.bgLight} rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm`}>
                 <svg className={`w-8 h-8 ${theme.textMain}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
               </div>
@@ -769,11 +769,11 @@ export default function App() {
 
         {/* MODAL PREVIEW FOTO */}
         {previewImage && (
-          <div className="absolute inset-0 z- bg-gray-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in">
+          <div className="absolute inset-0 z-50 bg-gray-900/95 backdrop-blur-md flex flex-col items-center justify-center p-4">
             <button onClick={() => setPreviewImage(null)} className="absolute top-8 right-8 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 w-12 h-12 rounded-full flex items-center justify-center transition-all">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <img src={previewImage.url} alt="Preview" className="w-full max-w-md max-h- object-contain rounded-2xl shadow-" />
+            <img src={previewImage.url} alt="Preview" className="w-full max-w-md max-h-screen object-contain rounded-2xl shadow-2xl" />
           </div>
         )}
 
