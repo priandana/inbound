@@ -49,6 +49,8 @@ const ITEMS = [
   { customer: "BENFARM BANDUNG FRESH", item: "DEBEZ MAKARONI KEJU GORENG 450GR", sku: "BEN-00000114" },
   { customer: "BENFARM BANDUNG FRESH", item: "BENFARM MAC & CHEESE BOLOGNESE 180GR", sku: "BEN-00000121" },
   { customer: "BENFARM BANDUNG FRESH", item: "DEBEZ MAKARONI PEDAS GORENG 300GR", sku: "BEN-00000126" },
+  { customer: "BENFARM BANDUNG FRESH", item: "BENFARM SAUSAGE BITES HOT SPICY 200GR", sku: "BEN-00000122" },
+  { customer: "BENFARM BANDUNG FRESH", item: "DEBEZ NAGET AYAM KRISPI 400GR", sku: "BEN-00000137" },
 ];
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────────
